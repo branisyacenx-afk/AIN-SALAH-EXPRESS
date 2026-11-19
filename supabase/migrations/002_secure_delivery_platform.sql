@@ -13,7 +13,8 @@ create index if not exists products_store_available_idx on public.products(store
 create index if not exists orders_customer_created_idx on public.orders(customer_id,created_at desc);
 create index if not exists orders_driver_status_idx on public.orders(driver_id,status,created_at desc);
 create index if not exists orders_status_created_idx on public.orders(status,created_at desc);
-create index if not exists order_history_order_created_idx on public.order_status_history(order_id,created_at);\ncreate index if not exists order_history_changed_by_idx on public.order_status_history(changed_by);
+create index if not exists order_history_order_created_idx on public.order_status_history(order_id,created_at);
+create index if not exists order_history_changed_by_idx on public.order_status_history(changed_by);
 create index if not exists order_history_changed_by_idx on public.order_status_history(changed_by);
 create or replace function private.handle_new_user() returns trigger language plpgsql security definer set search_path='' as $$begin insert into public.profiles(id,full_name,phone) values(new.id,coalesce(new.raw_user_meta_data->>'full_name',''),nullif(coalesce(new.phone,new.raw_user_meta_data->>'phone'),'')) on conflict(id) do nothing;return new;end;$$;
 revoke all on function private.handle_new_user() from public,anon,authenticated;
@@ -88,7 +89,8 @@ grant execute on function private.update_assigned_order_status(uuid,text) to aut
 create or replace function public.update_assigned_order_status(p_order_id uuid,p_new_status text) returns void language sql security invoker set search_path='' as $$select private.update_assigned_order_status(p_order_id,p_new_status);$$;
 revoke all on function public.update_assigned_order_status(uuid,text) from public,anon;
 grant execute on function public.update_assigned_order_status(uuid,text) to authenticated;
-grant select on public.stores,public.products to anon,authenticated;\ngrant insert,update,delete on public.stores,public.products to authenticated;
+grant select on public.stores,public.products to anon,authenticated;
+grant insert,update,delete on public.stores,public.products to authenticated;
 grant select,update on public.profiles to authenticated;
 grant select on public.orders,public.order_status_history to authenticated;
 grant select,insert,update on public.driver_locations to authenticated;
