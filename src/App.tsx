@@ -1,5 +1,6 @@
 import {useEffect,useState} from 'react';
-import type {Session,FormEvent} from '@supabase/supabase-js';
+import type {FormEvent} from 'react';
+import type {Session} from '@supabase/supabase-js';
 import {supabase} from './lib/supabase';
 import {Truck,Store,Package,ShoppingCart,LogOut,ShieldCheck,Bike,Plus,MapPin} from 'lucide-react';
 type Product={id:number;name:string;description:string;category:string;price_dzd:number;store_id:string|null};
