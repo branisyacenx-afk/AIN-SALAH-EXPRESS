@@ -13,44 +13,44 @@ create index if not exists products_store_available_idx on public.products(store
 create index if not exists orders_customer_created_idx on public.orders(customer_id,created_at desc);
 create index if not exists orders_driver_status_idx on public.orders(driver_id,status,created_at desc);
 create index if not exists orders_status_created_idx on public.orders(status,created_at desc);
-create index if not exists order_history_order_created_idx on public.order_status_history(order_id,created_at);
+create index if not exists order_history_order_created_idx on public.order_status_history(order_id,created_at);\ncreate index if not exists order_history_changed_by_idx on public.order_status_history(changed_by);
 create index if not exists order_history_changed_by_idx on public.order_status_history(changed_by);
-create or replace function private.handle_new_user() returns trigger language plpgsql security definer set search_path='' as $$begin insert into public.profiles(id,full_name,phone) values(new.id,coalesce(new.raw_user_meta_data->>'full_name',''),nullif(new.phone,'')) on conflict(id) do nothing;return new;end;$$;
+create or replace function private.handle_new_user() returns trigger language plpgsql security definer set search_path='' as $$begin insert into public.profiles(id,full_name,phone) values(new.id,coalesce(new.raw_user_meta_data->>'full_name',''),nullif(coalesce(new.phone,new.raw_user_meta_data->>'phone'),'')) on conflict(id) do nothing;return new;end;$$;
 revoke all on function private.handle_new_user() from public,anon,authenticated;
 drop trigger if exists on_auth_user_created_profile on auth.users;
 create trigger on_auth_user_created_profile after insert on auth.users for each row execute function private.handle_new_user();
 drop policy if exists profiles_read_self on public.profiles;
-create policy profiles_read_self on public.profiles for select to authenticated using(id=(select auth.uid()) or (select auth.jwt())->'app_metadata'->>'role'='admin');
+create policy profiles_read_self on public.profiles for select to authenticated using(id=(select auth.uid()) or (select auth.jwt()->'app_metadata'->>'role')='admin');
 drop policy if exists profiles_update_self on public.profiles;
-create policy profiles_update_self on public.profiles for update to authenticated using(id=(select auth.uid()) or (select auth.jwt())->'app_metadata'->>'role'='admin') with check(id=(select auth.uid()) or (select auth.jwt())->'app_metadata'->>'role'='admin');
+create policy profiles_update_self on public.profiles for update to authenticated using(id=(select auth.uid()) or (select auth.jwt()->'app_metadata'->>'role')='admin') with check(id=(select auth.uid()) or (select auth.jwt()->'app_metadata'->>'role')='admin');
 drop policy if exists stores_public_read on public.stores;
-create policy stores_public_read on public.stores for select to anon,authenticated using(is_active or (select auth.jwt())->'app_metadata'->>'role'='admin');
+create policy stores_public_read on public.stores for select to anon,authenticated using(is_active or (select auth.jwt()->'app_metadata'->>'role')='admin');
 drop policy if exists stores_admin_manage on public.stores;
-create policy stores_admin_manage on public.stores for all to authenticated using((select auth.jwt())->'app_metadata'->>'role'='admin') with check((select auth.jwt())->'app_metadata'->>'role'='admin');
+create policy stores_admin_manage on public.stores for all to authenticated using((select auth.jwt()->'app_metadata'->>'role')='admin') with check((select auth.jwt()->'app_metadata'->>'role')='admin');
 drop policy if exists products_public_read on public.products;
-create policy products_public_read on public.products for select to anon,authenticated using((is_available and (store_id is null or exists(select 1 from public.stores s where s.id=store_id and s.is_active))) or (select auth.jwt())->'app_metadata'->>'role'='admin');
+create policy products_public_read on public.products for select to anon,authenticated using((is_available and (store_id is null or exists(select 1 from public.stores s where s.id=store_id and s.is_active))) or (select auth.jwt()->'app_metadata'->>'role')='admin');
 drop policy if exists products_admin_manage on public.products;
-create policy products_admin_manage on public.products for all to authenticated using((select auth.jwt())->'app_metadata'->>'role'='admin') with check((select auth.jwt())->'app_metadata'->>'role'='admin');
+create policy products_admin_manage on public.products for all to authenticated using((select auth.jwt()->'app_metadata'->>'role')='admin') with check((select auth.jwt()->'app_metadata'->>'role')='admin');
 drop policy if exists orders_customer_read on public.orders;
 create policy orders_customer_read on public.orders for select to authenticated using(customer_id=(select auth.uid()));
 drop policy if exists orders_driver_read on public.orders;
-create policy orders_driver_read on public.orders for select to authenticated using(driver_id=(select auth.uid()) and (select auth.jwt())->'app_metadata'->>'role'='driver');
+create policy orders_driver_read on public.orders for select to authenticated using(driver_id=(select auth.uid()) and (select auth.jwt()->'app_metadata'->>'role')='driver');
 drop policy if exists orders_admin_read on public.orders;
-create policy orders_admin_read on public.orders for select to authenticated using((select auth.jwt())->'app_metadata'->>'role'='admin');
+create policy orders_admin_read on public.orders for select to authenticated using((select auth.jwt()->'app_metadata'->>'role')='admin');
 drop policy if exists orders_admin_update on public.orders;
-create policy orders_admin_update on public.orders for update to authenticated using((select auth.jwt())->'app_metadata'->>'role'='admin') with check((select auth.jwt())->'app_metadata'->>'role'='admin');
+create policy orders_admin_update on public.orders for update to authenticated using((select auth.jwt()->'app_metadata'->>'role')='admin') with check((select auth.jwt()->'app_metadata'->>'role')='admin');
 drop policy if exists locations_driver_manage on public.driver_locations;
-create policy locations_driver_manage on public.driver_locations for all to authenticated using(driver_id=(select auth.uid()) and (select auth.jwt())->'app_metadata'->>'role'='driver') with check(driver_id=(select auth.uid()) and (select auth.jwt())->'app_metadata'->>'role'='driver');
+create policy locations_driver_manage on public.driver_locations for all to authenticated using(driver_id=(select auth.uid()) and (select auth.jwt()->'app_metadata'->>'role')='driver') with check(driver_id=(select auth.uid()) and (select auth.jwt()->'app_metadata'->>'role')='driver');
 drop policy if exists locations_customer_read_assigned on public.driver_locations;
 create policy locations_customer_read_assigned on public.driver_locations for select to authenticated using(exists(select 1 from public.orders o where o.driver_id=driver_id and o.customer_id=(select auth.uid()) and o.status in('assigned','picked_up','on_the_way')));
 drop policy if exists locations_admin_read on public.driver_locations;
-create policy locations_admin_read on public.driver_locations for select to authenticated using((select auth.jwt())->'app_metadata'->>'role'='admin');
+create policy locations_admin_read on public.driver_locations for select to authenticated using((select auth.jwt()->'app_metadata'->>'role')='admin');
 drop policy if exists history_customer_read on public.order_status_history;
 create policy history_customer_read on public.order_status_history for select to authenticated using(exists(select 1 from public.orders o where o.id=order_id and o.customer_id=(select auth.uid())));
 drop policy if exists history_driver_read on public.order_status_history;
 create policy history_driver_read on public.order_status_history for select to authenticated using(exists(select 1 from public.orders o where o.id=order_id and o.driver_id=(select auth.uid())));
 drop policy if exists history_admin_read on public.order_status_history;
-create policy history_admin_read on public.order_status_history for select to authenticated using((select auth.jwt())->'app_metadata'->>'role'='admin');
+create policy history_admin_read on public.order_status_history for select to authenticated using((select auth.jwt()->'app_metadata'->>'role')='admin');
 create or replace function private.place_order(p_customer_phone text,p_delivery_address text,p_latitude double precision,p_longitude double precision,p_notes text,p_items jsonb) returns uuid language plpgsql security definer set search_path='' as $$
 declare v_uid uuid:=auth.uid();v_order_id uuid;v_subtotal integer;v_snapshot jsonb;
 begin
@@ -75,7 +75,7 @@ grant execute on function public.place_order(text,text,double precision,double p
 create or replace function private.update_assigned_order_status(p_order_id uuid,p_new_status text) returns void language plpgsql security definer set search_path='' as $$
 declare v_uid uuid:=auth.uid();v_old text;
 begin
- if v_uid is null or (select auth.jwt())->'app_metadata'->>'role'<>'driver' then raise exception 'Driver access required';end if;
+ if v_uid is null or (select auth.jwt()->'app_metadata'->>'role')<>'driver' then raise exception 'Driver access required';end if;
  if p_new_status not in('picked_up','on_the_way','delivered') then raise exception 'Invalid status';end if;
  select status into v_old from public.orders where id=p_order_id and driver_id=v_uid for update;
  if not found then raise exception 'Order not assigned to this driver';end if;
@@ -88,7 +88,7 @@ grant execute on function private.update_assigned_order_status(uuid,text) to aut
 create or replace function public.update_assigned_order_status(p_order_id uuid,p_new_status text) returns void language sql security invoker set search_path='' as $$select private.update_assigned_order_status(p_order_id,p_new_status);$$;
 revoke all on function public.update_assigned_order_status(uuid,text) from public,anon;
 grant execute on function public.update_assigned_order_status(uuid,text) to authenticated;
-grant select on public.stores,public.products to anon,authenticated;
+grant select on public.stores,public.products to anon,authenticated;\ngrant insert,update,delete on public.stores,public.products to authenticated;
 grant select,update on public.profiles to authenticated;
 grant select on public.orders,public.order_status_history to authenticated;
 grant select,insert,update on public.driver_locations to authenticated;
