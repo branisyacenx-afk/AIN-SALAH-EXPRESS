@@ -1,0 +1,97 @@
+-- AIN-SALAH-EXPRESS: secure ordering, profiles and delivery workflow.
+-- This migration extends the existing bigint products table without dropping data.
+create schema if not exists private;
+revoke all on schema private from public,anon,authenticated;
+create table if not exists public.profiles(id uuid primary key references auth.users(id) on delete cascade,full_name text not null default '',phone text,created_at timestamptz not null default now(),updated_at timestamptz not null default now());
+create table if not exists public.stores(id uuid primary key default gen_random_uuid(),name text not null,slug text not null unique,category text not null,description text not null default '',address text not null default '',is_active boolean not null default true,created_at timestamptz not null default now(),updated_at timestamptz not null default now());
+alter table public.products add column if not exists store_id uuid references public.stores(id) on delete cascade,add column if not exists name text not null default 'منتج جديد',add column if not exists description text not null default '',add column if not exists category text not null default 'عام',add column if not exists price_dzd integer not null default 0 check(price_dzd>=0),add column if not exists image_url text,add column if not exists is_available boolean not null default true,add column if not exists updated_at timestamptz not null default now();
+create table if not exists public.orders(id uuid primary key default gen_random_uuid(),order_number bigint generated always as identity unique,customer_id uuid not null references public.profiles(id),driver_id uuid references public.profiles(id),customer_phone text not null,delivery_address text not null,latitude double precision,longitude double precision,notes text not null default '',items jsonb not null check(jsonb_typeof(items)='array' and jsonb_array_length(items)>0),subtotal_dzd integer not null check(subtotal_dzd>=0),delivery_fee_dzd integer not null default 150 check(delivery_fee_dzd>=0),total_amount integer generated always as(subtotal_dzd+delivery_fee_dzd) stored,status text not null default 'pending' check(status in('pending','confirmed','preparing','ready','assigned','picked_up','on_the_way','delivered','cancelled')),created_at timestamptz not null default now(),updated_at timestamptz not null default now(),delivered_at timestamptz);
+create table if not exists public.driver_locations(driver_id uuid primary key references public.profiles(id) on delete cascade,latitude double precision not null check(latitude between -90 and 90),longitude double precision not null check(longitude between -180 and 180),is_available boolean not null default false,updated_at timestamptz not null default now());
+create table if not exists public.order_status_history(id bigint generated always as identity primary key,order_id uuid not null references public.orders(id) on delete cascade,changed_by uuid references public.profiles(id),old_status text,new_status text not null,note text not null default '',created_at timestamptz not null default now());
+alter table public.profiles enable row level security;alter table public.stores enable row level security;alter table public.products enable row level security;alter table public.orders enable row level security;alter table public.driver_locations enable row level security;alter table public.order_status_history enable row level security;
+create index if not exists products_store_available_idx on public.products(store_id,is_available);
+create index if not exists orders_customer_created_idx on public.orders(customer_id,created_at desc);
+create index if not exists orders_driver_status_idx on public.orders(driver_id,status,created_at desc);
+create index if not exists orders_status_created_idx on public.orders(status,created_at desc);
+create index if not exists order_history_order_created_idx on public.order_status_history(order_id,created_at);
+create index if not exists order_history_changed_by_idx on public.order_status_history(changed_by);
+create or replace function private.handle_new_user() returns trigger language plpgsql security definer set search_path='' as $$begin insert into public.profiles(id,full_name,phone) values(new.id,coalesce(new.raw_user_meta_data->>'full_name',''),nullif(new.phone,'')) on conflict(id) do nothing;return new;end;$$;
+revoke all on function private.handle_new_user() from public,anon,authenticated;
+drop trigger if exists on_auth_user_created_profile on auth.users;
+create trigger on_auth_user_created_profile after insert on auth.users for each row execute function private.handle_new_user();
+drop policy if exists profiles_read_self on public.profiles;
+create policy profiles_read_self on public.profiles for select to authenticated using(id=(select auth.uid()) or (select auth.jwt())->'app_metadata'->>'role'='admin');
+drop policy if exists profiles_update_self on public.profiles;
+create policy profiles_update_self on public.profiles for update to authenticated using(id=(select auth.uid()) or (select auth.jwt())->'app_metadata'->>'role'='admin') with check(id=(select auth.uid()) or (select auth.jwt())->'app_metadata'->>'role'='admin');
+drop policy if exists stores_public_read on public.stores;
+create policy stores_public_read on public.stores for select to anon,authenticated using(is_active or (select auth.jwt())->'app_metadata'->>'role'='admin');
+drop policy if exists stores_admin_manage on public.stores;
+create policy stores_admin_manage on public.stores for all to authenticated using((select auth.jwt())->'app_metadata'->>'role'='admin') with check((select auth.jwt())->'app_metadata'->>'role'='admin');
+drop policy if exists products_public_read on public.products;
+create policy products_public_read on public.products for select to anon,authenticated using((is_available and (store_id is null or exists(select 1 from public.stores s where s.id=store_id and s.is_active))) or (select auth.jwt())->'app_metadata'->>'role'='admin');
+drop policy if exists products_admin_manage on public.products;
+create policy products_admin_manage on public.products for all to authenticated using((select auth.jwt())->'app_metadata'->>'role'='admin') with check((select auth.jwt())->'app_metadata'->>'role'='admin');
+drop policy if exists orders_customer_read on public.orders;
+create policy orders_customer_read on public.orders for select to authenticated using(customer_id=(select auth.uid()));
+drop policy if exists orders_driver_read on public.orders;
+create policy orders_driver_read on public.orders for select to authenticated using(driver_id=(select auth.uid()) and (select auth.jwt())->'app_metadata'->>'role'='driver');
+drop policy if exists orders_admin_read on public.orders;
+create policy orders_admin_read on public.orders for select to authenticated using((select auth.jwt())->'app_metadata'->>'role'='admin');
+drop policy if exists orders_admin_update on public.orders;
+create policy orders_admin_update on public.orders for update to authenticated using((select auth.jwt())->'app_metadata'->>'role'='admin') with check((select auth.jwt())->'app_metadata'->>'role'='admin');
+drop policy if exists locations_driver_manage on public.driver_locations;
+create policy locations_driver_manage on public.driver_locations for all to authenticated using(driver_id=(select auth.uid()) and (select auth.jwt())->'app_metadata'->>'role'='driver') with check(driver_id=(select auth.uid()) and (select auth.jwt())->'app_metadata'->>'role'='driver');
+drop policy if exists locations_customer_read_assigned on public.driver_locations;
+create policy locations_customer_read_assigned on public.driver_locations for select to authenticated using(exists(select 1 from public.orders o where o.driver_id=driver_id and o.customer_id=(select auth.uid()) and o.status in('assigned','picked_up','on_the_way')));
+drop policy if exists locations_admin_read on public.driver_locations;
+create policy locations_admin_read on public.driver_locations for select to authenticated using((select auth.jwt())->'app_metadata'->>'role'='admin');
+drop policy if exists history_customer_read on public.order_status_history;
+create policy history_customer_read on public.order_status_history for select to authenticated using(exists(select 1 from public.orders o where o.id=order_id and o.customer_id=(select auth.uid())));
+drop policy if exists history_driver_read on public.order_status_history;
+create policy history_driver_read on public.order_status_history for select to authenticated using(exists(select 1 from public.orders o where o.id=order_id and o.driver_id=(select auth.uid())));
+drop policy if exists history_admin_read on public.order_status_history;
+create policy history_admin_read on public.order_status_history for select to authenticated using((select auth.jwt())->'app_metadata'->>'role'='admin');
+create or replace function private.place_order(p_customer_phone text,p_delivery_address text,p_latitude double precision,p_longitude double precision,p_notes text,p_items jsonb) returns uuid language plpgsql security definer set search_path='' as $$
+declare v_uid uuid:=auth.uid();v_order_id uuid;v_subtotal integer;v_snapshot jsonb;
+begin
+ if v_uid is null then raise exception 'يجب تسجيل الدخول لإرسال الطلب';end if;
+ if coalesce(length(trim(p_customer_phone)),0)<8 then raise exception 'رقم الهاتف غير صالح';end if;
+ if coalesce(length(trim(p_delivery_address)),0)<5 then raise exception 'عنوان التوصيل مطلوب';end if;
+ if jsonb_typeof(p_items)<>'array' or jsonb_array_length(p_items)=0 or jsonb_array_length(p_items)>30 then raise exception 'السلة غير صالحة';end if;
+ with requested as(select (x->>'product_id')::bigint product_id,(x->>'quantity')::integer quantity from jsonb_array_elements(p_items)x)
+ select sum(p.price_dzd*r.quantity)::integer,jsonb_agg(jsonb_build_object('product_id',p.id,'name',p.name,'unit_price',p.price_dzd,'quantity',r.quantity)) into v_subtotal,v_snapshot
+ from requested r join public.products p on p.id=r.product_id and p.is_available where r.quantity between 1 and 20;
+ if v_subtotal is null or jsonb_array_length(v_snapshot)<>jsonb_array_length(p_items) then raise exception 'بعض المنتجات غير متوفرة أو الكمية غير صحيحة';end if;
+ if v_subtotal>2000000 then raise exception 'قيمة الطلب تتجاوز الحد المسموح';end if;
+ insert into public.orders(customer_id,customer_phone,delivery_address,latitude,longitude,notes,items,subtotal_dzd) values(v_uid,trim(p_customer_phone),trim(p_delivery_address),p_latitude,p_longitude,coalesce(p_notes,''),v_snapshot,v_subtotal) returning id into v_order_id;
+ insert into public.order_status_history(order_id,changed_by,new_status,note) values(v_order_id,v_uid,'pending','تم استلام الطلب');return v_order_id;
+end;$$;
+revoke all on function private.place_order(text,text,double precision,double precision,text,jsonb) from public,anon,authenticated;
+grant usage on schema private to authenticated;
+grant execute on function private.place_order(text,text,double precision,double precision,text,jsonb) to authenticated;
+create or replace function public.place_order(p_customer_phone text,p_delivery_address text,p_latitude double precision,p_longitude double precision,p_notes text,p_items jsonb) returns uuid language sql security invoker set search_path='' as $$select private.place_order(p_customer_phone,p_delivery_address,p_latitude,p_longitude,p_notes,p_items);$$;
+revoke all on function public.place_order(text,text,double precision,double precision,text,jsonb) from public,anon;
+grant execute on function public.place_order(text,text,double precision,double precision,text,jsonb) to authenticated;
+create or replace function private.update_assigned_order_status(p_order_id uuid,p_new_status text) returns void language plpgsql security definer set search_path='' as $$
+declare v_uid uuid:=auth.uid();v_old text;
+begin
+ if v_uid is null or (select auth.jwt())->'app_metadata'->>'role'<>'driver' then raise exception 'Driver access required';end if;
+ if p_new_status not in('picked_up','on_the_way','delivered') then raise exception 'Invalid status';end if;
+ select status into v_old from public.orders where id=p_order_id and driver_id=v_uid for update;
+ if not found then raise exception 'Order not assigned to this driver';end if;
+ if not((v_old='assigned' and p_new_status='picked_up')or(v_old='picked_up' and p_new_status='on_the_way')or(v_old='on_the_way' and p_new_status='delivered')) then raise exception 'Invalid order status transition';end if;
+ update public.orders set status=p_new_status,updated_at=now(),delivered_at=case when p_new_status='delivered' then now() else delivered_at end where id=p_order_id;
+ insert into public.order_status_history(order_id,changed_by,old_status,new_status,note)values(p_order_id,v_uid,v_old,p_new_status,'تحديث من تطبيق السائق');
+end;$$;
+revoke all on function private.update_assigned_order_status(uuid,text) from public,anon,authenticated;
+grant execute on function private.update_assigned_order_status(uuid,text) to authenticated;
+create or replace function public.update_assigned_order_status(p_order_id uuid,p_new_status text) returns void language sql security invoker set search_path='' as $$select private.update_assigned_order_status(p_order_id,p_new_status);$$;
+revoke all on function public.update_assigned_order_status(uuid,text) from public,anon;
+grant execute on function public.update_assigned_order_status(uuid,text) to authenticated;
+grant select on public.stores,public.products to anon,authenticated;
+grant select,update on public.profiles to authenticated;
+grant select on public.orders,public.order_status_history to authenticated;
+grant select,insert,update on public.driver_locations to authenticated;
+grant select,insert on public.order_status_history to authenticated;
+grant select,insert,update on public.orders to authenticated;
+insert into public.stores(name,slug,category,description,address)values('متاجر عين صالح','ain-salah-local','متاجر وخدمات','متاجر وخدمات محلية في عين صالح','عين صالح')on conflict(slug)do nothing;
