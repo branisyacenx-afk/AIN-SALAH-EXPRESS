@@ -12,3 +12,7 @@
 .category-chips button.selected,.category-chips button:hover{background:#214d39;color:white;border-color:#214d39}
 .product-photo{width:100%;height:115px;object-fit:cover;border-radius:13px;margin-bottom:13px;background:#edf4ee}
 @media(max-width:800px){.product-photo{height:85px}.category-chips{margin-inline:-2px}}
+
+.driver-toolbar{display:flex;align-items:center;justify-content:space-between;gap:18px;background:#fff;border:1px solid var(--line);border-radius:17px;padding:20px;margin:18px 0}
+.driver-toolbar h1{margin:5px 0;font-size:24px}.driver-toolbar p{margin:0;color:var(--muted);font-size:11px}
+@media(max-width:600px){.driver-toolbar{align-items:flex-start;flex-direction:column}.driver-toolbar .primary{width:100%}}
