@@ -1,0 +1,63 @@
+import {useCallback,useEffect,useMemo,useState} from 'react';
+import type {FormEvent} from 'react';
+import {supabase} from './lib/supabase';
+import {Wallet,ArrowDownLeft,ArrowUpRight,RefreshCw,Plus,CheckCircle2,Clock3,Building2,Bike,FileText} from 'lucide-react';
+
+type Entry={id:string;entity_type:string;entity_user_id:string|null;store_id:string|null;order_id:string|null;entry_type:string;direction:'credit'|'debit';amount_dzd:number;status:string;reference:string;notes:string;created_at:string};
+type Settlement={id:string;entity_type:string;entity_user_id:string|null;store_id:string|null;amount_dzd:number;status:string;payment_method:string;payment_reference:string;requester_note:string;admin_note:string;requested_at:string};
+const money=(v:number)=>new Intl.NumberFormat('fr-DZ').format(v)+' دج';
+const types:Record<string,string>={delivery_earning:'أجرة توصيل',merchant_sale:'مستحقات مبيعات',platform_commission:'عمولة المنصة',joining_fee:'رسوم انضمام',contract_fee:'رسوم عقد',adjustment:'تسوية يدوية',refund:'استرداد',payout:'صرف مستحقات',cash_collection:'تحصيل نقدي'};
+const status:Record<string,string>={requested:'طلب جديد',approved:'موافق عليه',paid:'تم الدفع',rejected:'مرفوض',posted:'مرحّل',pending:'معلق',void:'ملغى'};
+const inputStyle:React.CSSProperties={width:'100%'};
+
+export function AdminFinanceCenter(){
+ const [entries,E]=useState<Entry[]>([]),[requests,R]=useState<Settlement[]>([]),[profiles,P]=useState<Record<string,string>>({}),[stores,S]=useState<Record<string,string>>({});
+ const [entityType,T]=useState('driver'),[entityUser,U]=useState(''),[storeId,Store]=useState(''),[entryType,EntryType]=useState('adjustment'),[direction,D]=useState<'credit'|'debit'>('credit'),[amount,A]=useState(''),[reference,Ref]=useState(''),[notes,N]=useState('');
+ const [busy,B]=useState(false),[notice,M]=useState(''),[filter,F]=useState('all');
+ const load=useCallback(async()=>{if(!supabase)return;B(true);const [l,r,p,s]=await Promise.all([
+  supabase.from('financial_ledger').select('*').order('created_at',{ascending:false}).limit(500),
+  supabase.from('settlement_requests').select('*').order('requested_at',{ascending:false}).limit(200),
+  supabase.from('profiles').select('id,full_name,phone'),
+  supabase.from('stores').select('id,name')
+ ]);
+  if(l.error)M('تعذر تحميل دفتر القيود: '+l.error.message);else E((l.data||[]) as Entry[]);
+  if(r.error)M('تعذر تحميل طلبات التسوية: '+r.error.message);else R((r.data||[]) as Settlement[]);
+  P(Object.fromEntries((p.data||[]).map((x:any)=>[x.id,x.full_name||x.phone||x.id.slice(0,8)])));
+  S(Object.fromEntries((s.data||[]).map((x:any)=>[x.id,x.name])));
+  B(false);
+ },[]);
+ useEffect(()=>{load()},[load]);
+ const filtered=useMemo(()=>entries.filter(x=>filter==='all'||x.entity_type===filter),[entries,filter]);
+ const totals=useMemo(()=>entries.filter(x=>x.status==='posted').reduce((a,x)=>{const k=x.entity_type; a[k]=(a[k]||0)+(x.direction==='credit'?1:-1)*Number(x.amount_dzd);return a},{} as Record<string,number>),[entries]);
+ async function post(e:FormEvent){e.preventDefault();if(!supabase)return;const n=Number(amount);if(!Number.isSafeInteger(n)||n<=0){M('أدخل مبلغاً صحيحاً أكبر من صفر.');return}if(entityType==='driver'&&!entityUser){M('اختر حساب السائق.');return}if(entityType==='merchant'&&!storeId){M('اختر المتجر.');return}B(true);const {data,error}=await supabase.rpc('admin_post_financial_entry',{p_entity_type:entityType,p_entity_user_id:entityType==='driver'||entityType==='customer'?entityUser:null,p_store_id:entityType==='merchant'?storeId:null,p_order_id:null,p_entry_type:entryType,p_direction:direction,p_amount_dzd:n,p_reference:reference.trim(),p_notes:notes.trim()});M(error?'تعذر ترحيل القيد: '+error.message:'تم ترحيل القيد المالي وتسجيله في سجل التدقيق.');if(!error){A('');Ref('');N('');await load()}B(false)}
+ async function settle(id:string,next:'approved'|'paid'|'rejected'){if(!supabase)return;const note=prompt(next==='paid'?'أدخل مرجع التحويل أو إيصال الدفع:':'ملاحظة الإدارة (اختياري):','');if(note===null)return;const patch:any={status:next,admin_note:note,reviewed_at:new Date().toISOString()};if(next==='paid'){patch.paid_at=new Date().toISOString();patch.payment_reference=note}const {error}=await supabase.from('settlement_requests').update(patch).eq('id',id);M(error?'تعذر تحديث التسوية: '+error.message:'تم تحديث حالة طلب التسوية.');await load()}
+ return <section className="admin-workspace finance-center" dir="rtl">
+  <div className="admin-welcome"><div><span className="eyebrow">FINANCE · LEDGER · SETTLEMENTS</span><h1>المركز المالي ودفتر المستحقات</h1><p>كل حركة مالية تُسجل كقيد مستقل مرتبط بالطرف والطلب والمرجع، مع سجل تدقيق إداري.</p></div><button className="admin-link" onClick={load}><RefreshCw size={16}/> تحديث البيانات</button></div>
+  <div className="admin-kpis">{[['السائقون',totals.driver||0],['المطاعم',totals.merchant||0],['المنصة',totals.platform||0],['الزبائن',totals.customer||0]].map(([k,v])=><article key={String(k)}><span>صافي القيود · {k}</span><b>{money(Number(v))}</b><small>القيود المرحلة فقط</small></article>)}</div>
+  <form className="admin-form-card" onSubmit={post}><h2><Plus size={18}/> إضافة قيد مالي</h2><p className="field-hint">لا تستخدم القيد إلا بعد التحقق من العملية ومستندها. القيود المرحلة لا تُعدّل؛ صححها بقيد عكسي موثق.</p>
+   <div className="admin-form-grid">
+    <label>نوع الطرف<select value={entityType} onChange={e=>T(e.target.value)}><option value="driver">سائق</option><option value="merchant">مطعم / متجر</option><option value="platform">المنصة</option><option value="customer">زبون</option></select></label>
+    {entityType==='merchant'?<label>المتجر<select required value={storeId} onChange={e=>Store(e.target.value)}><option value="">اختر المتجر</option>{Object.entries(stores).map(([id,n])=><option value={id} key={id}>{n}</option>)}</select></label>:entityType!=='platform'?<label>صاحب الحساب<select required value={entityUser} onChange={e=>U(e.target.value)}><option value="">اختر الحساب</option>{Object.entries(profiles).map(([id,n])=><option value={id} key={id}>{n}</option>)}</select></label>:null}
+    <label>نوع الحركة<select value={entryType} onChange={e=>EntryType(e.target.value)}>{Object.entries(types).map(([v,n])=><option value={v} key={v}>{n}</option>)}</select></label>
+    <label>الاتجاه<select value={direction} onChange={e=>D(e.target.value)}><option value="credit">إضافة إلى الرصيد</option><option value="debit">خصم من الرصيد</option></select></label>
+    <label>المبلغ بالدينار<input required type="number" min="1" step="1" value={amount} onChange={e=>A(e.target.value)}/></label>
+    <label>رقم المرجع / الوصل<input value={reference} onChange={e=>Ref(e.target.value)} maxLength={160}/></label>
+    <label className="wide">الشرح والملاحظات<input value={notes} onChange={e=>N(e.target.value)} maxLength={1000}/></label>
+   </div><button className="primary" disabled={busy}>ترحيل القيد المالي</button>
+  </form>
+  <article className="admin-form-card"><div className="admin-card-head"><div><h2><Wallet size={18}/> دفتر القيود المالية</h2><p>آخر 500 قيد، مع فصل قيود كل طرف.</p></div><select value={filter} onChange={e=>F(e.target.value)}><option value="all">كل الأطراف</option><option value="driver">السائقون</option><option value="merchant">المتاجر</option><option value="platform">المنصة</option><option value="customer">الزبائن</option></select></div>
+   <div className="ops-list">{filtered.map(x=><div className="ops-list-row" key={x.id}><div><b>{types[x.entry_type]||x.entry_type} · {x.entity_type==='merchant'?(stores[x.store_id||'']||'متجر'):x.entity_type==='platform'?'المنصة':profiles[x.entity_user_id||'']||'حساب'}</b><small>{x.reference||'دون مرجع'} · {x.notes||'—'} · {new Date(x.created_at).toLocaleString('ar-DZ')}</small></div><div className="finance-amount"><strong className={x.direction==='credit'?'credit':'debit'}>{x.direction==='credit'?'+':'−'}{money(x.amount_dzd)}</strong><small>{status[x.status]||x.status}</small></div></div>)}{!filtered.length&&<p className="empty">لا توجد قيود في هذا العرض.</p>}</div>
+  </article>
+  <article className="admin-form-card"><div className="admin-card-head"><div><h2><FileText size={18}/> طلبات صرف المستحقات</h2><p>طلبات السائقين والمطاعم، والموافقة والتسجيل عند تنفيذ التحويل فعلياً.</p></div></div><div className="ops-list">{requests.map(x=><div className="ops-list-row" key={x.id}><div><b>{x.entity_type==='driver'?'سائق':'متجر'} · {x.entity_type==='merchant'?stores[x.store_id||'']||'متجر':profiles[x.entity_user_id||'']||'حساب'} · {money(x.amount_dzd)}</b><small>{x.requester_note||'—'} · {new Date(x.requested_at).toLocaleString('ar-DZ')} · {status[x.status]||x.status}</small></div><div className="ops-user-actions">{x.status==='requested'&&<><button className="text-button" onClick={()=>settle(x.id,'approved')}>موافقة</button><button className="text-button" onClick={()=>settle(x.id,'rejected')}>رفض</button></>}{x.status==='approved'&&<button className="primary" onClick={()=>settle(x.id,'paid')}>تسجيل الدفع</button>}</div></div>)}{!requests.length&&<p className="empty">لا توجد طلبات تسوية بعد.</p>}</div></article>
+  {notice&&<p className="message" role="status">{notice}</p>}
+ </section>;
+}
+
+export function MyFinanceSummary({userId,role}:{userId:string;role:'driver'|'merchant'}){
+ const [storeId,Store]=useState(''),[entries,E]=useState<Entry[]>([]),[requests,R]=useState<Settlement[]>([]),[amount,A]=useState(''),[note,N]=useState(''),[busy,B]=useState(false),[notice,M]=useState('');
+ const load=useCallback(async()=>{if(!supabase)return;let sid=storeId;if(role==='merchant'){const {data}=await supabase.from('stores').select('id').eq('owner_id',userId).maybeSingle();sid=data?.id||'';Store(sid)}const q=role==='driver'?supabase.from('financial_ledger').select('*').eq('entity_user_id',userId):supabase.from('financial_ledger').select('*').eq('store_id',sid);const [l,r]=await Promise.all([q.order('created_at',{ascending:false}).limit(200),role==='driver'?supabase.from('settlement_requests').select('*').eq('entity_user_id',userId).order('requested_at',{ascending:false}).limit(30):supabase.from('settlement_requests').select('*').eq('store_id',sid).order('requested_at',{ascending:false}).limit(30)]);if(l.error)M(l.error.message);else E((l.data||[]) as Entry[]);if(!r.error)R((r.data||[]) as Settlement[])},[userId,role,storeId]);
+ useEffect(()=>{load()},[load]);
+ const balance=entries.filter(x=>x.status==='posted').reduce((n,x)=>n+(x.direction==='credit'?1:-1)*x.amount_dzd,0);
+ async function request(e:FormEvent){e.preventDefault();const n=Number(amount);if(!supabase||!Number.isSafeInteger(n)||n<=0){M('أدخل مبلغاً صحيحاً.');return}if(n>Math.max(balance,0)){M('المبلغ المطلوب أكبر من الرصيد الدائن المتاح.');return}B(true);const {error}=await supabase.from('settlement_requests').insert({entity_type:role,entity_user_id:role==='driver'?userId:null,store_id:role==='merchant'?storeId:null,amount_dzd:n,requester_note:note.trim()});M(error?'تعذر إرسال طلب الصرف: '+error.message:'تم إرسال طلب الصرف للإدارة.');if(!error){A('');N('');await load()}B(false)}
+ return <section className="admin-form-card my-finance" dir="rtl"><div className="admin-card-head"><div><span className="eyebrow">MY FINANCIAL ACCOUNT</span><h2>{role==='driver'?'كشف مستحقات السائق':'كشف مستحقات المتجر'}</h2></div><button className="admin-link" onClick={load}><RefreshCw size={15}/> تحديث</button></div><div className="finance-balance"><span>الرصيد الدائن حسب القيود المرحلة</span><b>{money(balance)}</b></div><form onSubmit={request} className="ops-inline-form"><label>طلب صرف مبلغ (دج)<input type="number" min="1" max={Math.max(balance,0)} step="1" required value={amount} onChange={e=>A(e.target.value)}/></label><label>ملاحظة للإدارة<input value={note} onChange={e=>N(e.target.value)} maxLength={500}/></label><button className="primary" disabled={busy||balance<=0}>إرسال طلب صرف</button></form><div className="ops-list">{requests.map(x=><div className="ops-list-row" key={x.id}><b>{money(x.amount_dzd)} · {status[x.status]||x.status}</b><small>{new Date(x.requested_at).toLocaleString('ar-DZ')} · {x.admin_note||x.requester_note}</small></div>)}{!requests.length&&<p className="empty">لا توجد طلبات صرف.</p>}</div><div className="ops-list">{entries.slice(0,20).map(x=><div className="ops-list-row" key={x.id}><div><b>{types[x.entry_type]||x.entry_type}</b><small>{x.reference||'—'} · {new Date(x.created_at).toLocaleString('ar-DZ')}</small></div><strong className={x.direction==='credit'?'credit':'debit'}>{x.direction==='credit'?'+':'−'}{money(x.amount_dzd)}</strong></div>)}</div>{notice&&<p className="message">{notice}</p>}</section>;
+}
