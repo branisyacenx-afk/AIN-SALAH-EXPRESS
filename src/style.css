@@ -262,3 +262,6 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .store-picker-editor .store-picker-map{height:230px}
 .store-picker-editor .primary{width:100%;justify-content:center}
 .driver-map-toolbar-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.driver-map-toolbar-actions .text-button{white-space:nowrap}@media(max-width:560px){.driver-map-toolbar-actions{justify-content:space-between}}
+
+/* Multi-page Arabic agreements */
+.contract-page{break-after:page;page-break-after:always;padding:8px 0 22px;min-height:720px}.contract-page:last-child{break-after:auto;page-break-after:auto}.contract-page h3{margin:24px 0 12px;padding:10px 13px;background:#f2f5f2;border-right:4px solid #e98742;border-radius:7px;font-size:15px}.contract-page ol,.contract-page ul{padding-right:26px}.contract-page li{margin:0 0 10px;line-height:2.05;text-align:justify}.contract-page p{line-height:2;text-align:justify}@media print{.contract-page{break-after:page;page-break-after:always;min-height:0;padding:0}.contract-page:last-child{break-after:auto;page-break-after:auto}.contract-page h3{break-after:avoid;background:#f2f2f2!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}.contract-page li{font-size:10.5pt!important;line-height:1.8!important}.contract-page{orphans:3;widows:3}}
