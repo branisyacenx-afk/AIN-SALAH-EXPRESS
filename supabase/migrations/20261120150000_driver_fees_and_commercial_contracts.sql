@@ -34,3 +34,24 @@ on conflict (key) do nothing;
 
 create index if not exists driver_applications_payment_status_idx
 on public.driver_applications(payment_status,created_at desc);
+
+-- Enforce settlement in the database too, not only in the admin interface.
+create or replace function public.enforce_driver_joining_fee_before_approval()
+returns trigger language plpgsql security definer set search_path = ''
+as $$
+begin
+  if new.is_approved is true and exists (
+    select 1 from public.driver_applications a
+    where a.user_id = new.user_id and a.joining_fee_dzd > 0
+      and a.payment_status = 'unpaid' and a.status <> 'rejected'
+  ) then
+    raise exception 'Driver joining fee must be marked paid or waived before approval';
+  end if;
+  return new;
+end;
+$$;
+revoke all on function public.enforce_driver_joining_fee_before_approval() from public, anon, authenticated;
+drop trigger if exists driver_joining_fee_approval_guard on public.driver_profiles;
+create trigger driver_joining_fee_approval_guard
+before insert or update of is_approved on public.driver_profiles
+for each row execute function public.enforce_driver_joining_fee_before_approval();
