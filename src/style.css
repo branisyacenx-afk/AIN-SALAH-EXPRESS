@@ -233,3 +233,27 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .catalog-head-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .favorites-filter{display:inline-flex;align-items:center;gap:7px;padding:8px 12px;border:1px solid #e5e9e5;border-radius:22px;background:#fff;color:#68776d;font-size:10px;font-weight:700}
 .favorites-filter.active{background:#fff3f2;border-color:#efc8c5;color:#c4514d}
+
+/* Interactive restaurant pin picker */
+.store-location-field{display:grid;gap:9px;padding:14px;border:1px solid #e1e9e1;border-radius:14px;background:#fbfdfb}
+.store-location-field>b{font-size:13px;color:#294638}
+.store-picker-map{height:310px;overflow:hidden;border:1px solid #dce5dc;border-radius:13px}
+.store-picker-map .leaflet-container{height:100%;width:100%;z-index:1}
+.coordinates-readout{padding:9px 12px;background:#f1f5f1;border-radius:9px;color:#506357;font:12px ui-monospace,monospace;text-align:left}
+.admin-store-card{flex-wrap:wrap}
+.admin-store-card .store-location-status{font-size:10px;color:#627469}
+@media(max-width:560px){.store-picker-map{height:250px}}
+/* Full-width driver dispatch map */
+.driver-live-workspace{margin:18px 0 22px;padding:16px;background:#fff;border:1px solid #dfe8df;border-radius:20px;box-shadow:0 8px 24px #1c332008}
+.driver-live-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.driver-live-heading h2{margin:5px 0;font-size:19px;color:#243b2f}
+.driver-live-heading p{margin:0;color:#78857b;font-size:12px;line-height:1.7}
+.gps-live-state,.gps-off-state{white-space:nowrap;padding:8px 11px;border-radius:30px;font-size:11px;background:#edf8f0;color:#19804b}
+.gps-off-state{background:#fff4e9;color:#a36a35}
+.driver-map-toolbar{display:flex;align-items:end;justify-content:space-between;gap:12px;margin:15px 0;font-size:11px;color:#7b877e}
+.driver-map-toolbar label{display:grid;gap:6px;flex:1;max-width:420px;font-weight:700}
+.driver-map-toolbar select{width:100%;padding:10px;border:1px solid #e1e8e1;border-radius:10px;background:#fff;font:inherit}
+.driver-map-large{height:clamp(350px,58vh,620px);overflow:hidden;border:1px solid #dce5dc;border-radius:15px;background:#eef3ee}
+.driver-map-large .leaflet-container{height:100%;width:100%;z-index:1}
+.driver-map-foot{display:flex;gap:16px;flex-wrap:wrap;padding:12px 4px 2px;color:#617268;font-size:11px}
+@media(max-width:560px){.driver-live-workspace{padding:11px;border-radius:15px}.driver-live-heading{flex-direction:column}.driver-map-toolbar{align-items:stretch;flex-direction:column}.driver-map-large{height:440px}.driver-map-foot{gap:9px;font-size:10px}}
