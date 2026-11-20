@@ -207,3 +207,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .print-document .signature-grid{margin-top:34px;min-height:110px;align-items:end}
 @media(max-width:600px){.contract-terms-grid{grid-template-columns:1fr}.driver-fee-admin>*{flex:1 1 auto}.driver-fee-admin button{width:100%;text-align:center}}
 @media print{.contract-terms-grid{grid-template-columns:1fr 1fr}.contract-terms-grid>div{background:#fff;border-color:#ddd}}
+
+/* Driver feedback is a short-lived toast, never a permanent page block. */
+.driver-toast{position:fixed;z-index:2500;inset:auto 50% 22px auto;transform:translateX(50%);width:min(92vw,520px);margin:0;padding:13px 17px;border:1px solid #f0d5bd;border-radius:13px;box-shadow:0 12px 34px #15271d26;background:#fff8ef;color:#785333;text-align:center;animation:driver-toast-in .18s ease-out;pointer-events:none}
+@keyframes driver-toast-in{from{opacity:0;translate:0 8px}to{opacity:1;translate:0 0}}
