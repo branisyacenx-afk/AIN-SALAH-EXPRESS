@@ -171,3 +171,12 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .product button:disabled{opacity:.45;cursor:not-allowed;filter:grayscale(.3)}
 button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #f3a36b;outline-offset:2px}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+
+/* Native PWA installation action */
+.install-app-wrap{position:relative;display:flex;align-items:center}
+.install-app-button{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid #d9eadc;background:#edf7ef;color:#245b38;border-radius:12px;padding:11px 15px;font-size:12px;font-weight:800;white-space:nowrap;cursor:pointer;transition:.2s}
+.install-app-button:hover:not(:disabled){background:#dff0e3;transform:translateY(-1px)}
+.install-app-button:disabled{opacity:.75;cursor:default}
+.install-app-button span{font-size:17px;line-height:12px}
+.install-app-hint{position:absolute;top:calc(100% + 9px);right:0;z-index:30;width:min(290px,82vw);padding:11px 13px;border:1px solid #dce8dd;border-radius:12px;background:#fff;color:#405548;box-shadow:0 10px 30px #172b201c;font-size:11px;line-height:1.8}
+@media(max-width:760px){.public-header{height:auto;min-height:76px;padding:12px 14px;gap:8px;flex-wrap:wrap}.public-header nav{display:none}.public-actions{gap:6px;flex-wrap:wrap}.public-actions .primary,.public-login,.install-app-button{padding:9px 11px;font-size:10px}.install-app-wrap{order:-1}.install-app-hint{right:auto;left:0}}
