@@ -1,0 +1,1 @@
+create index if not exists support_messages_sender_created_idx on public.support_messages(sender_id, created_at desc);
