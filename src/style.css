@@ -211,3 +211,15 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 /* Driver feedback is a short-lived toast, never a permanent page block. */
 .driver-toast{position:fixed;z-index:2500;inset:auto 50% 22px auto;transform:translateX(50%);width:min(92vw,520px);margin:0;padding:13px 17px;border:1px solid #f0d5bd;border-radius:13px;box-shadow:0 12px 34px #15271d26;background:#fff8ef;color:#785333;text-align:center;animation:driver-toast-in .18s ease-out;pointer-events:none}
 @keyframes driver-toast-in{from{opacity:0;translate:0 8px}to{opacity:1;translate:0 0}}
+
+/* Financial ledger and settlement workspace */
+.finance-center .finance-amount{display:flex;flex-direction:column;align-items:flex-end;gap:4px;min-width:110px}
+.finance-center .finance-amount strong,.my-finance .finance-balance b{font-variant-numeric:tabular-nums;font-size:1.05rem}
+.finance-center .credit,.my-finance .credit{color:#16834b}
+.finance-center .debit,.my-finance .debit{color:#b94b36}
+.my-finance{margin:18px 0}
+.my-finance .finance-balance{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px;border:1px solid #dce8df;border-radius:14px;background:#f4faf5;margin:12px 0 18px}
+.my-finance .finance-balance b{font-size:1.5rem;color:#176b3c}
+.finance-center .admin-kpis article b{font-variant-numeric:tabular-nums}
+.finance-center .ops-user-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+@media(max-width:640px){.my-finance .finance-balance{align-items:flex-start;flex-direction:column}.finance-center .ops-list-row{align-items:flex-start;gap:10px}.finance-center .finance-amount{min-width:unset}}
