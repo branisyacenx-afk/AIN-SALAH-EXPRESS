@@ -138,3 +138,7 @@
 .zone-map-editor{width:100%;overflow:hidden;border:1px solid #dfe7df;border-radius:12px;margin:8px 0}
 .zone-map-editor .leaflet-container{font-family:inherit}
 @media(max-width:520px){.zone-map-editor .leaflet-container{height:210px!important}}
+
+
+/* Driver live GPS and dispatch clarity */
+.driver-gps-card{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:15px 18px;margin:14px 0;background:#fff;border:1px solid #e3ebe3;border-radius:15px}.driver-gps-card>div{display:grid;gap:6px;min-width:0}.driver-gps-card b{display:flex;align-items:center;gap:7px;color:#294638;font-size:13px}.driver-gps-card span{font-size:11px;line-height:1.7;color:#7a887e;overflow-wrap:anywhere}.driver-gps-card small{font:10px ui-monospace,monospace;color:#d17b42}.driver-gps-card .text-button{white-space:nowrap}.driver-map{height:245px;margin:12px 0 18px;border:1px solid #dfe8df;border-radius:16px;overflow:hidden;background:#eef3ee}.driver-map .leaflet-container{height:100%;width:100%;z-index:1}@media(max-width:520px){.driver-gps-card{align-items:flex-start;flex-direction:column}.driver-map{height:220px}}
