@@ -121,3 +121,16 @@
 .ops-control .admin-kpis{grid-template-columns:repeat(4,minmax(0,1fr))}
 @media(max-width:850px){.ops-grid{grid-template-columns:1fr}.ops-inline-form{grid-template-columns:repeat(2,minmax(0,1fr))}.ops-control .admin-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:520px){.ops-toolbar{align-items:stretch}.ops-toolbar>span{width:100%}.ops-toolbar button{flex:1;justify-content:center;font-size:10px}.ops-inline-form{grid-template-columns:1fr}.ops-control .admin-form-card{padding:17px}.ops-list-row{padding:10px}.ops-list-row small{line-height:1.7}}
+
+/* Notification center and account controls */
+.notification-center{position:relative;display:inline-flex;align-items:center;z-index:30}
+.notification-toggle{position:relative;display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border:1px solid #e6ece6;border-radius:11px;background:#fff;color:#375746;cursor:pointer}
+.notification-toggle span{position:absolute;top:-5px;left:-5px;min-width:17px;height:17px;padding:0 4px;border-radius:20px;background:#e77e3c;color:#fff;font-size:9px;display:grid;place-items:center}
+.notification-popover{position:absolute;top:44px;left:0;width:min(340px,calc(100vw - 28px));max-height:420px;overflow:auto;background:#fff;border:1px solid #e3eae3;border-radius:15px;box-shadow:0 14px 40px #18362420;padding:10px;z-index:100}
+.notification-head{display:flex;justify-content:space-between;align-items:center;padding:8px 9px;border-bottom:1px solid #edf1ed}
+.notification-head b{font-size:13px}.notification-head small{font-size:10px;color:#839087}
+.notification-item{display:grid;gap:5px;width:100%;text-align:right;border:0;border-bottom:1px solid #f0f3f0;background:#fff;padding:11px 9px;color:#304237;cursor:pointer}
+.notification-item.unread{background:#fff8f2}
+.notification-item b{font-size:12px}.notification-item small{font-size:11px;line-height:1.7;color:#68786e}.notification-item time{font-size:9px;color:#9aa49c}
+.ops-user-actions{display:flex!important;align-items:center;gap:8px;flex-wrap:wrap}
+@media(max-width:520px){.notification-popover{left:-42px;width:min(320px,calc(100vw - 24px))}.account{gap:6px}}
