@@ -134,3 +134,7 @@
 .notification-item b{font-size:12px}.notification-item small{font-size:11px;line-height:1.7;color:#68786e}.notification-item time{font-size:9px;color:#9aa49c}
 .ops-user-actions{display:flex!important;align-items:center;gap:8px;flex-wrap:wrap}
 @media(max-width:520px){.notification-popover{left:-42px;width:min(320px,calc(100vw - 24px))}.account{gap:6px}}
+
+.zone-map-editor{width:100%;overflow:hidden;border:1px solid #dfe7df;border-radius:12px;margin:8px 0}
+.zone-map-editor .leaflet-container{font-family:inherit}
+@media(max-width:520px){.zone-map-editor .leaflet-container{height:210px!important}}
