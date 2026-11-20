@@ -39,7 +39,7 @@ export function AdminFinanceCenter(){
     <label>نوع الطرف<select value={entityType} onChange={e=>T(e.target.value)}><option value="driver">سائق</option><option value="merchant">مطعم / متجر</option><option value="platform">المنصة</option><option value="customer">زبون</option></select></label>
     {entityType==='merchant'?<label>المتجر<select required value={storeId} onChange={e=>Store(e.target.value)}><option value="">اختر المتجر</option>{Object.entries(stores).map(([id,n])=><option value={id} key={id}>{n}</option>)}</select></label>:entityType!=='platform'?<label>صاحب الحساب<select required value={entityUser} onChange={e=>U(e.target.value)}><option value="">اختر الحساب</option>{Object.entries(profiles).map(([id,n])=><option value={id} key={id}>{n}</option>)}</select></label>:null}
     <label>نوع الحركة<select value={entryType} onChange={e=>EntryType(e.target.value)}>{Object.entries(types).map(([v,n])=><option value={v} key={v}>{n}</option>)}</select></label>
-    <label>الاتجاه<select value={direction} onChange={e=>D(e.target.value)}><option value="credit">إضافة إلى الرصيد</option><option value="debit">خصم من الرصيد</option></select></label>
+    <label>الاتجاه<select value={direction} onChange={e=>D(e.target.value as 'credit'|'debit')}><option value="credit">إضافة إلى الرصيد</option><option value="debit">خصم من الرصيد</option></select></label>
     <label>المبلغ بالدينار<input required type="number" min="1" step="1" value={amount} onChange={e=>A(e.target.value)}/></label>
     <label>رقم المرجع / الوصل<input value={reference} onChange={e=>Ref(e.target.value)} maxLength={160}/></label>
     <label className="wide">الشرح والملاحظات<input value={notes} onChange={e=>N(e.target.value)} maxLength={1000}/></label>
