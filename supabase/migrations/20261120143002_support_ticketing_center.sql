@@ -37,7 +37,10 @@ with check (
   sender_id = (select auth.uid())
   and (
     (sender_role in ('customer','merchant','driver')
-      and exists (select 1 from public.support_tickets t where t.id = ticket_id and t.user_id = (select auth.uid()))
+      and exists (
+        select 1 from public.support_tickets t
+        where t.id = ticket_id and t.user_id = (select auth.uid()) and t.status <> 'closed'
+      )
       and sender_role = coalesce((select auth.jwt()->'app_metadata'->>'role'), 'customer'))
     or (sender_role = 'admin' and (select auth.jwt()->'app_metadata'->>'role') = 'admin')
   )
