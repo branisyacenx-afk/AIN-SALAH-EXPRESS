@@ -1,6 +1,6 @@
 import {useCallback,useEffect,useMemo,useState} from 'react';
 import {supabase} from './lib/supabase';
-import {MapContainer,TileLayer,Polygon,useMapEvents} from 'react-leaflet';
+import {MapContainer,TileLayer,Polygon,Polyline,Marker,useMapEvents} from 'react-leaflet';
 import {Activity,Coins,MapPinned,Ticket,Settings2,Download,Plus,RefreshCw,ToggleLeft,ToggleRight,Trash2,Save,ShieldCheck} from 'lucide-react';
 
 type Rule={id:string;name:string;rule_key:string;amount_dzd:number;percentage:number|null;is_active:boolean;config:Record<string,unknown>};
@@ -10,7 +10,7 @@ type Stats={orders:number;today:number;open:number;delivered:number;revenue:numb
 const dz=(n:number)=>new Intl.NumberFormat('fr-DZ').format(n)+' دج';
 
 function ZoneMapClicks({onPick}:{onPick:(point:[number,number])=>void}){useMapEvents({click:e=>onPick([e.latlng.lat,e.latlng.lng])});return null}
-function ZonePolygonEditor({points,onPick}:{points:[number,number][];onPick:(point:[number,number])=>void}){return <div className="zone-map-editor"><MapContainer center={[27.193,2.46]} zoom={13} scrollWheelZoom={false} style={{height:240,width:'100%',borderRadius:12}}><TileLayer attribution='&copy; OpenStreetMap' url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"/><ZoneMapClicks onPick={onPick}/>{points.length>=3&&<Polygon positions={points}/>}</MapContainer></div>}
+function ZonePolygonEditor({points,onPick}:{points:[number,number][];onPick:(point:[number,number])=>void}){return <div className="zone-map-editor"><MapContainer center={[27.193,2.46]} zoom={13} scrollWheelZoom={false} style={{height:240,width:'100%',borderRadius:12}}><TileLayer attribution='&copy; OpenStreetMap' url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"/><ZoneMapClicks onPick={onPick}/>{points.length>1&&<Polyline positions={points}/ >}{points.map((point,i)=><Marker key={i} position={point}/>)}{points.length>=3&&<Polygon positions={points}/>}</MapContainer></div>}
 
 export function AdminControlPanel(){
  const [rules,R]=useState<Rule[]>([]),[zones,Z]=useState<Zone[]>([]),[coupons,C]=useState<Coupon[]>([]),[stats,S]=useState<Stats>({orders:0,today:0,open:0,delivered:0,revenue:0,drivers:0,stores:0,products:0});
