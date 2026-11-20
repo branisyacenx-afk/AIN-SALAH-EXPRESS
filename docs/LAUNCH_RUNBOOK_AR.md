@@ -33,6 +33,7 @@
 - تأكد من وجود متغيري الإنتاج VITE_SUPABASE_URL وVITE_SUPABASE_ANON_KEY في إعدادات المشروع.
 - لا تضع service_role أو SUPABASE_SECRET_KEY أو أي سر خادمي في متغير يبدأ بـ VITE_.
 - تأكد من أن نطاق الإنتاج هو https://ain-salah-express.vercel.app/ وأن آخر نشر بحالة READY.
+- أُضيفت ترويسات أمان للمتصفح: منع تضمين الموقع داخل إطارات خارجية، منع MIME sniffing، سياسة إحالة محافظة، وقصر إذن GPS على نفس النطاق.
 - بعد تغيير متغيرات البيئة، أعد النشر.
 
 ### Supabase Auth
