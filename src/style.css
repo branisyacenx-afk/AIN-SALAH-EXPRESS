@@ -257,3 +257,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .driver-map-large .leaflet-container{height:100%;width:100%;z-index:1}
 .driver-map-foot{display:flex;gap:16px;flex-wrap:wrap;padding:12px 4px 2px;color:#617268;font-size:11px}
 @media(max-width:560px){.driver-live-workspace{padding:11px;border-radius:15px}.driver-live-heading{flex-direction:column}.driver-map-toolbar{align-items:stretch;flex-direction:column}.driver-map-large{height:440px}.driver-map-foot{gap:9px;font-size:10px}}
+
+.store-picker-editor{display:grid;gap:8px;width:100%;margin-top:8px}
+.store-picker-editor .store-picker-map{height:230px}
+.store-picker-editor .primary{width:100%;justify-content:center}
