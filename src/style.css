@@ -193,3 +193,17 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .public-support-links{display:flex;align-items:center;gap:14px;flex-wrap:wrap}.public-support-links a,.public-support-links button{border:0;background:transparent;color:inherit;text-decoration:none;font-size:11px;cursor:pointer}.public-support-links a:hover,.public-support-links button:hover{color:#e17e3b}
 @media(max-width:760px){.support-contact-grid{grid-template-columns:1fr}.support-layout{grid-template-columns:1fr}.support-ticket-list{max-height:260px}.support-conversation{min-height:360px}.support-heading{padding:17px}.support-heading-icon{width:48px;height:48px;flex-basis:48px}.public-footer{flex-wrap:wrap}.public-support-links{width:100%;justify-content:center;order:3}}
 @media(max-width:480px){.support-toolbar{align-items:flex-start;flex-direction:column}.support-toolbar>div:last-child{width:100%}.support-toolbar>div:last-child>*{flex:1}.support-reply-form{align-items:stretch;flex-direction:column}.support-reply-form .primary{justify-content:center}.support-message{max-width:94%}.support-contact-card{padding:13px}.support-contact-card strong{font-size:10px}}
+
+/* Cleaner operational feedback and legal documents */
+.message{animation:ase-message-in .18s ease-out;box-shadow:0 3px 12px #8b67300b}
+@keyframes ase-message-in{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+.driver-fee-admin{display:flex;align-items:center;gap:10px;flex-wrap:wrap;width:100%;padding:12px 14px;margin:10px 0;border:1px solid #e9ece7;border-radius:12px;background:#f8faf7;font-size:11px}
+.driver-fee-admin b{color:#385d43}.driver-fee-admin .pill.paid{background:#e8f5e9;color:#2f7741}
+.contract-terms-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:12px 0 20px}
+.contract-terms-grid>div{display:grid;gap:5px;padding:10px 12px;border:1px solid #e7ece7;border-radius:9px;background:#fafcfa;break-inside:avoid}
+.contract-terms-grid b{font-size:10px;color:#6c7c70}.contract-terms-grid span{font-size:12px;line-height:1.8;overflow-wrap:anywhere}
+.print-document h3{margin:20px 0 9px;padding-bottom:6px;border-bottom:1px solid #ddd;font-size:15px}
+.print-document ol{line-height:2.1}
+.print-document .signature-grid{margin-top:34px;min-height:110px;align-items:end}
+@media(max-width:600px){.contract-terms-grid{grid-template-columns:1fr}.driver-fee-admin>*{flex:1 1 auto}.driver-fee-admin button{width:100%;text-align:center}}
+@media print{.contract-terms-grid{grid-template-columns:1fr 1fr}.contract-terms-grid>div{background:#fff;border-color:#ddd}}
