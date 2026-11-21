@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
-  ActivityIndicator, Alert, FlatList, KeyboardAvoidingView, Platform, Pressable,
+  ActivityIndicator, Alert, FlatList, Image, KeyboardAvoidingView, Platform, Pressable,
   RefreshControl, ScrollView, StatusBar, StyleSheet, Text, TextInput, View
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -166,7 +166,7 @@ export default function App() {
   }
 
   if (booting) return <View style={s.center}><ActivityIndicator size="large" color={C.green}/><Text style={s.muted}>جارٍ تجهيز عين صالح إكسبريس...</Text></View>;
-  if (!isSupabaseConfigured || !supabase) return <SafeAreaView style={s.page}><View style={s.brand}><Text style={s.brandMark}>ASE</Text><Text style={s.brandTitle}>عين صالح إكسبريس</Text></View><Text style={s.notice}>يلزم ربط التطبيق بإعدادات Supabase نفسها المستخدمة في الموقع.</Text></SafeAreaView>;
+  if (!isSupabaseConfigured || !supabase) return <SafeAreaView style={s.page}><View style={s.brand}><Image source={require("./assets/icon.png")} style={{ width: 88, height: 88, borderRadius: 22 }} resizeMode="contain" /><Text style={s.brandTitle}>عين صالح إكسبريس</Text></View><Text style={s.notice}>يلزم ربط التطبيق بإعدادات Supabase نفسها المستخدمة في الموقع.</Text></SafeAreaView>;
 
   if (!session) return <SafeAreaView style={s.page}><StatusBar barStyle="dark-content"/><KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={s.authWrap}>
     <View style={s.brand}><Text style={s.brandMark}>ASE</Text><Text style={s.brandTitle}>عين صالح إكسبريس</Text><Text style={s.muted}>خدمات مدينتك، أقرب إليك</Text></View>
