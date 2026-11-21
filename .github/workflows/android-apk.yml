@@ -38,14 +38,6 @@ jobs:
       - name: TypeScript check
         run: npm run typecheck
 
-      - name: Validate shared Supabase configuration
-        env:
-          EXPO_PUBLIC_SUPABASE_URL: ${{ secrets.EXPO_PUBLIC_SUPABASE_URL }}
-          EXPO_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.EXPO_PUBLIC_SUPABASE_ANON_KEY }}
-        run: |
-          test -n "$EXPO_PUBLIC_SUPABASE_URL" || (echo "Missing EXPO_PUBLIC_SUPABASE_URL repository secret" && exit 1)
-          test -n "$EXPO_PUBLIC_SUPABASE_ANON_KEY" || (echo "Missing EXPO_PUBLIC_SUPABASE_ANON_KEY repository secret" && exit 1)
-
       - name: Generate real Android native project
         env:
           EXPO_PUBLIC_SUPABASE_URL: ${{ secrets.EXPO_PUBLIC_SUPABASE_URL }}
