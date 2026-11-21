@@ -30,7 +30,7 @@ const rolePresets: Record<string, { label: string; description: string; permissi
   operations_manager: { label: 'مدير العمليات', description: 'متابعة الطلبات والجودة والأداء دون صلاحيات مالية أو إدارة المستخدمين', permissions: { 'dashboard.view': true, 'orders.view': true, 'orders.manage': true, 'reports.view': true, 'quality.view': true, 'performance.view': true, 'stores.view': true, 'drivers.view': true } },
   dispatch_manager: { label: 'مسؤول التوصيل', description: 'متابعة الطلبات والسائقين والإسناد', permissions: { 'dashboard.view': true, 'orders.view': true, 'orders.manage': true, 'drivers.view': true, 'drivers.manage': true, 'performance.view': true } },
   quality_auditor: { label: 'مراقب الجودة', description: 'قراءة التقييمات ومؤشرات الجودة والتقارير دون تعديل العمليات', permissions: { 'dashboard.view': true, 'reports.view': true, 'quality.view': true, 'performance.view': true, 'orders.view': true } },
-  partner_manager: { label: 'مسؤول الشركاء', description: 'إدارة المتاجر والكتالوج ومتابعة أداء الشركاء', permissions: { 'dashboard.view': true, 'stores.view': true, 'stores.manage': true, 'catalog.view': true, 'catalog.manage': true, 'performance.view': true } },
+  partner_manager: { label: 'مسؤول الشركاء', description: 'إدارة المتاجر والكتالوج ومتابعة أداء الشركاء', permissions: { 'dashboard.view': true, 'stores.view': true, 'stores.manage': true, 'catalog.manage': true, 'performance.view': true } },
   order_observer: { label: 'مراقب الطلبات', description: 'قراءة الطلبات ومؤشرات الجودة دون تعديلها', permissions: { 'dashboard.view': true, 'orders.view': true, 'quality.view': true } },
   finance_viewer: { label: 'مراقب مالي', description: 'قراءة التقارير والمدفوعات والسجلات المالية فقط', permissions: { 'dashboard.view': true, 'reports.view': true, 'finance.view': true } },
   catalog_manager: { label: 'مسؤول الكتالوج', description: 'إدارة المنتجات والتصنيفات', permissions: { 'dashboard.view': true, 'stores.view': true, 'catalog.manage': true } },
@@ -100,7 +100,7 @@ export default function AdminGovernance({ view, currentUserId }: { view: Mode; c
         setStaff((s.data || []) as Staff[]);
       } else {
         const [o, r, st, dp, prof, tk, fl, py, sr] = await Promise.all([
-          readAll('orders', 'id,order_number,status,total_amount,created_at,delivered_at,accepted_at,driver_id,store_id'),
+          readAll('orders', 'id,order_number,status,total_amount,subtotal_dzd,created_at,delivered_at,accepted_at,driver_id,store_id'),
           readAll('reviews', 'id,order_id,rating,comment,driver_id,store_id,created_at'),
           readAll('stores', 'id,name,is_active,created_at'),
           readAll('driver_profiles', 'user_id,vehicle_type,is_approved,is_online,is_suspended,created_at'),
@@ -133,8 +133,10 @@ export default function AdminGovernance({ view, currentUserId }: { view: Mode; c
   const completionRate = periodData.length ? delivered.length / periodData.length * 100 : 0;
   const cancelRate = periodData.length ? cancelled.length / periodData.length * 100 : 0;
   const deliveryMinutes = delivered.filter(o => o.delivered_at && o.created_at).map(o => (new Date(o.delivered_at).getTime() - new Date(o.created_at).getTime()) / 60000).filter(n => n >= 0 && n < 1440);
-  const avgRating = average(reviews.map(r => Number(r.rating)).filter(n => n >= 1 && n <= 5));
-  const lowRatings = reviews.filter(r => Number(r.rating) <= 2);
+  const { start: qualityStart, end: qualityEnd } = periodBounds(period);
+  const periodReviews = reviews.filter(r => new Date(r.created_at) >= qualityStart && new Date(r.created_at) < qualityEnd);
+  const avgRating = average(periodReviews.map(r => Number(r.rating)).filter(n => n >= 1 && n <= 5));
+  const lowRatings = periodReviews.filter(r => Number(r.rating) <= 2);
   const openTickets = tickets.filter(t => !['closed', 'resolved'].includes(String(t.status).toLowerCase()));
 
   const chart = useMemo(() => {
@@ -176,7 +178,7 @@ export default function AdminGovernance({ view, currentUserId }: { view: Mode; c
     const related = orders.filter(o => o.store_id === st.id);
     const done = related.filter(o => o.status === 'delivered');
     const ratings = reviews.filter(r => r.store_id === st.id).map(r => Number(r.rating));
-    return { ...st, totalOrders: related.length, done: done.length, cancelled: related.filter(o => o.status === 'cancelled').length, sales: done.reduce((sum, o) => sum + Number(o.total_amount || 0), 0), rating: average(ratings), ratingCount: ratings.length };
+    return { ...st, totalOrders: related.length, done: done.length, cancelled: related.filter(o => o.status === 'cancelled').length, sales: done.reduce((sum, o) => sum + Number(o.subtotal_dzd || 0), 0), rating: average(ratings), ratingCount: ratings.length };
   }).sort((a, b) => b.sales - a.sales), [stores, orders, reviews]);
 
   async function addStaff(e: FormEvent) {
@@ -269,11 +271,12 @@ export default function AdminGovernance({ view, currentUserId }: { view: Mode; c
     </>}
 
     {view === 'quality-admin' && <>
+      <div className="governance-period-switch" role="group" aria-label="فترة مؤشرات الجودة">{(['day', 'week', 'month'] as Period[]).map(p => <button type="button" key={p} className={period === p ? 'active' : ''} onClick={() => setPeriod(p)}>{p === 'day' ? 'اليوم' : p === 'week' ? 'هذا الأسبوع' : 'هذا الشهر'}</button>)}<span><CalendarDays size={15}/>{periodLabel}</span></div>
       <div className="admin-kpis governance-kpis">
         <article><span>نسبة إتمام الطلبات</span><b>{completionRate.toFixed(1)}%</b><small>ضمن {periodLabel}</small></article>
         <article><span>نسبة الإلغاء</span><b>{cancelRate.toFixed(1)}%</b><small>ضمن {periodLabel}</small></article>
         <article><span>متوسط التوصيل</span><b>{deliveryMinutes.length ? Math.round(average(deliveryMinutes)) + ' د' : '—'}</b><small>من إنشاء الطلب حتى التسليم</small></article>
-        <article><span>متوسط التقييم</span><b>{reviews.length ? avgRating.toFixed(1) + '/5' : '—'}</b><small>{reviews.length} تقييم مسجل</small></article>
+        <article><span>متوسط التقييم</span><b>{reviews.length ? avgRating.toFixed(1) + '/5' : '—'}</b><small>{periodReviews.length} تقييم خلال {periodLabel}</small></article>
         <article><span>تقييمات منخفضة</span><b>{lowRatings.length}</b><small>نجمتان أو أقل</small></article>
         <article><span>تذاكر دعم مفتوحة</span><b>{openTickets.length}</b><small>حسب حالات التذاكر</small></article>
       </div>
@@ -307,7 +310,7 @@ export default function AdminGovernance({ view, currentUserId }: { view: Mode; c
         </article>
         <article className="governance-panel"><div className="governance-section-head"><div><span className="eyebrow">PAYMENT & SETTLEMENT STATUS</span><h2>المدفوعات والتسويات</h2></div></div>
           <div className="governance-alert-line"><BadgeCheck size={17}/><span>مدفوعات ناجحة</span><b>{payments.filter(x => ['paid','succeeded','completed'].includes(String(x.status).toLowerCase())).length}</b></div>
-          <div className="governance-alert-line"><Clock3 size={17}/><span>مدفوعات قيد المتابعة</span><b>{payments.filter(x => !['paid','succeeded','completed','failed','cancelled'].includes(String(x.status).toLowerCase())).length}</b></div>
+          <div className="governance-alert-line"><Clock3 size={17}/><span>مدفوعات قيد المتابعة</span><b>{payments.filter(x => !['paid','succeeded','completed','failed','cancelled','refunded'].includes(String(x.status).toLowerCase())).length}</b></div>
           <div className="governance-alert-line"><AlertTriangle size={17}/><span>تسويات بانتظار المعالجة</span><b>{settlements.filter(x => !['paid','completed','rejected','cancelled'].includes(String(x.status).toLowerCase())).length}</b></div>
           <p className="governance-footnote">هذه الشاشة للقراءة والمراجعة فقط. لا تنفذ دفعاً أو تحويلاً مالياً ولا تستنتج ربحاً صافياً من الحركات وحدها.</p>
         </article>
