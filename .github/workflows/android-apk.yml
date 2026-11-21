@@ -1,21 +1,22 @@
-name: Build Android APK
+name: Build Native Android App
 
 on:
   workflow_dispatch:
   push:
     branches: [main]
     paths:
-      - 'capacitor.config.ts'
-      - 'package.json'
-      - 'src/**'
+      - 'apps/mobile/**'
       - '.github/workflows/android-apk.yml'
 
 permissions:
   contents: write
 
 jobs:
-  build:
+  build-native-android:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/mobile
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -29,31 +30,40 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '21'
+          java-version: '17'
 
-      - name: Install dependencies
+      - name: Validate shared Supabase configuration
+        env:
+          EXPO_PUBLIC_SUPABASE_URL: ${{ secrets.EXPO_PUBLIC_SUPABASE_URL }}
+          EXPO_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.EXPO_PUBLIC_SUPABASE_ANON_KEY }}
+        run: |
+          test -n "$EXPO_PUBLIC_SUPABASE_URL" || (echo "Missing EXPO_PUBLIC_SUPABASE_URL repository secret" && exit 1)
+          test -n "$EXPO_PUBLIC_SUPABASE_ANON_KEY" || (echo "Missing EXPO_PUBLIC_SUPABASE_ANON_KEY repository secret" && exit 1)
+
+      - name: Install native app dependencies
         run: npm install
 
-      - name: Create Android project
-        run: npx cap add android
+      - name: TypeScript check
+        run: npm run typecheck
 
-      - name: Prepare Capacitor assets directory
-        run: mkdir -p android/app/src/main/assets
+      - name: Generate real Android native project
+        env:
+          EXPO_PUBLIC_SUPABASE_URL: ${{ secrets.EXPO_PUBLIC_SUPABASE_URL }}
+          EXPO_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.EXPO_PUBLIC_SUPABASE_ANON_KEY }}
+        run: npx expo prebuild --platform android --non-interactive
 
-      - name: Sync Capacitor
-        run: npx cap sync android
-
-      - name: Build debug APK
-        working-directory: android
+      - name: Build native APK
+        working-directory: apps/mobile/android
         run: |
           chmod +x gradlew
           ./gradlew assembleDebug
 
-      - name: Publish APK release
+      - name: Publish native APK
+        working-directory: .
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          TAG="android-v1.0.${{ github.run_number }}"
-          gh release create "$TAG" android/app/build/outputs/apk/debug/app-debug.apk \
-            --title "AIN SALAH EXPRESS Android ${TAG}" \
-            --notes "Android app package for AIN SALAH EXPRESS. Connects to the live platform at https://ain-salah-express.vercel.app/."
+          TAG="native-android-v1.0.${{ github.run_number }}"
+          gh release create "$TAG" apps/mobile/android/app/build/outputs/apk/debug/app-debug.apk \
+            --title "AIN SALAH EXPRESS Native Android ${TAG}" \
+            --notes "Native React Native Android application for customers and drivers. Uses the existing AIN SALAH EXPRESS Supabase project. Admin and merchant portals remain on the website."
