@@ -2,5 +2,10 @@ User-agent: *
 Allow: /
 Disallow: /admin
 Disallow: /dashboard
+Disallow: /checkout
+Disallow: /account
+Disallow: /orders
+Disallow: /driver
+Disallow: /merchant
 
 Sitemap: https://ain-salah-express.vercel.app/sitemap.xml
