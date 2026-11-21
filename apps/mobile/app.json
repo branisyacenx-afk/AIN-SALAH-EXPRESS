@@ -1,0 +1,20 @@
+{
+  "expo": {
+    "name": "عين صالح إكسبريس",
+    "slug": "ain-salah-express",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "android": {
+      "package": "dz.ain.salah.express",
+      "versionCode": 1,
+      "permissions": ["ACCESS_FINE_LOCATION", "ACCESS_COARSE_LOCATION"]
+    },
+    "plugins": [
+      ["expo-location", {
+        "locationWhenInUsePermission": "نحتاج إلى موقعك لعرض عنوان التوصيل وتتبع السائق أثناء تنفيذ الطلب."
+      }]
+    ]
+  }
+}
