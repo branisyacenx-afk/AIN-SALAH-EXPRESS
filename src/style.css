@@ -630,3 +630,27 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .ops-command-grid button:active{background:#fff4eb;border-color:#efb184}
 @media(max-width:800px){.ops-command-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;padding:9px}.ops-command-grid button{min-height:58px;padding:10px;font-size:11px}}
 @media(max-width:360px){.ops-command-grid{grid-template-columns:1fr}}
+
+
+/* Mobile-first navigation and customer discovery order */
+@media(max-width:800px){
+ .app>header{display:grid!important;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"brand account" "nav nav";align-items:center;gap:10px 12px;padding:12px 14px!important;min-height:0!important}
+ .app>header>.brand{grid-area:brand;min-width:0;justify-self:start}
+ .app>header>.account{grid-area:account;justify-self:end;display:flex;align-items:center;gap:8px;font-size:11px;white-space:nowrap}
+ .app>header>nav{grid-area:nav;order:initial!important;width:100%!important;display:flex;align-items:center;gap:7px;overflow-x:auto;overflow-y:hidden;justify-content:flex-start;white-space:nowrap;padding:2px 0 5px;scrollbar-width:thin}
+ .app>header>nav button{flex:0 0 auto!important;min-height:39px;padding:9px 13px!important;font-size:11px!important;border-radius:11px}
+ .app>header>nav button.active{background:#214d39;color:#fff}
+ .app>header>.account button{padding:7px}
+}
+@media(min-width:801px){.app>header{display:flex;align-items:center;gap:22px}.app>header>nav{flex:1;min-width:0;justify-content:center;flex-wrap:wrap}}
+.app>main:has(.local-seo-content){display:flex;flex-direction:column}
+.app>main:has(.local-seo-content)>#products{order:1}
+.app>main:has(.local-seo-content)>.local-seo-content{order:2}
+.driver-document-picker{display:block;border:1px dashed #e1b18e;background:#fff9f4;border-radius:14px;padding:14px;line-height:1.8}
+.driver-document-picker .driver-document-help{display:block;color:#7c887f;font-size:11px;font-weight:400;margin:3px 0 10px}
+.driver-document-picker input[type=file]{display:block;width:100%;max-width:100%;padding:12px;border:1px solid #ead8c9;border-radius:10px;background:#fff;font:inherit;font-size:12px}
+.driver-selected-files{display:grid;gap:8px;margin:12px 0;padding:12px;background:#f2f7f2;border:1px solid #dfe9df;border-radius:12px}
+.driver-selected-files>b{font-size:12px}
+.driver-selected-files>span{display:flex;align-items:center;justify-content:space-between;gap:8px;overflow-wrap:anywhere;font-size:11px;color:#43554a}
+.driver-selected-files button{flex:0 0 auto;border:0;background:#fff0e8;color:#a85428;border-radius:8px;padding:6px 9px;font:inherit}
+@media(max-width:560px){.app>main:has(.local-seo-content){padding-top:8px}.driver-document-picker{padding:12px}.driver-selected-files>span{align-items:flex-start}}
