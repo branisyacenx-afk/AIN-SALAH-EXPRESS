@@ -334,3 +334,6 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .contract-list-summary{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px}
 .contract-list-summary span{padding:6px 10px;border-radius:20px;background:#edf4ee;color:#45664f;font-size:10px;font-weight:800}
 @media(max-width:680px){.ops-command-bar{position:relative;top:auto;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));padding:8px}.ops-command-bar button{font-size:10px;padding:10px 6px}.admin-contract-integrated{padding:12px!important}.contract-list-summary span{font-size:9px}}
+
+.contract-brand-logo{display:block;width:92px;height:92px;object-fit:contain;margin:0 auto 10px}
+@media print{.contract-brand-logo{width:78px;height:78px;filter:none}}
