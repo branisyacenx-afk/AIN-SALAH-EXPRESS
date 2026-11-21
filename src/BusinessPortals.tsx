@@ -60,14 +60,14 @@ import {DRIVER_CONTRACT_TEMPLATE,MERCHANT_CONTRACT_TEMPLATE,DATA_PROCESSING_TEMP
 type ContractRow={id:string;contract_number:string;contract_type:string;subject_user_id:string|null;store_id:string|null;subject_name:string;subject_email:string;subject_phone:string;subject_address:string;terms:Record<string,unknown>;status:string;created_at:string;signed_at:string|null;signed_by_name:string};
 type LegalDocKey='driver'|'merchant'|'privacy'|'framework';
 function renderLegalMarkdown(markdown:string){
- return markdown.split('\\n').map((raw,i)=>{
+ return markdown.split(/\r?\n/).map((raw,i)=>{
   const line=raw.trimEnd();if(!line.trim())return <div className="legal-doc-space" key={i}/>;
-  if(line.startsWith('# '))return <h2 className="legal-doc-title" key={i}>{line.slice(2).replace(/\\*\\*/g,'')}</h2>;
-  if(line.startsWith('## '))return <h3 className="legal-doc-heading" key={i}>{line.slice(3).replace(/\\*\\*/g,'')}</h3>;
-  if(line.startsWith('### '))return <h4 className="legal-doc-subheading" key={i}>{line.slice(4).replace(/\\*\\*/g,'')}</h4>;
-  if(/^[-*] /.test(line))return <p className="legal-doc-list" key={i}>• {line.slice(2).replace(/\\*\\*/g,'')}</p>;
-  if(/^\\d+[.)] /.test(line))return <p className="legal-doc-list" key={i}>{line.replace(/\\*\\*/g,'')}</p>;
-  return <p className="legal-doc-paragraph" key={i}>{line.replace(/\\*\\*/g,'').replace(/\\`/g,'')}</p>;
+  if(line.startsWith('# '))return <h2 className="legal-doc-title" key={i}>{line.slice(2).replace(/\*\*/g,'')}</h2>;
+  if(line.startsWith('## '))return <h3 className="legal-doc-heading" key={i}>{line.slice(3).replace(/\*\*/g,'')}</h3>;
+  if(line.startsWith('### '))return <h4 className="legal-doc-subheading" key={i}>{line.slice(4).replace(/\*\*/g,'')}</h4>;
+  if(/^[-*] /.test(line))return <p className="legal-doc-list" key={i}>• {line.slice(2).replace(/\*\*/g,'')}</p>;
+  if(/^\d+[.)] /.test(line))return <p className="legal-doc-list" key={i}>{line.replace(/\*\*/g,'')}</p>;
+  return <p className="legal-doc-paragraph" key={i}>{line.replace(/\*\*/g,'')}</p>;
  });
 }
 export function AdminContractManager({background=false}:{background?:boolean}={}){
