@@ -522,3 +522,6 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .governance-table td{font-variant-numeric:tabular-nums}
 .governance-table td:nth-child(3){font-weight:800;color:#315b41}
 .governance-workspace button:disabled,.governance-workspace select:disabled{opacity:.55;cursor:not-allowed}
+
+.governance-form-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.governance-cancel-edit{border:1px solid var(--line);background:#fff;border-radius:10px;padding:10px 14px;font-size:12px;font-weight:800;cursor:pointer}
