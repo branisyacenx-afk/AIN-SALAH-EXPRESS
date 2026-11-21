@@ -514,3 +514,11 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
  .governance-chart-bars{height:120px;width:15px}
  .governance-breakdown-row{grid-template-columns:minmax(75px,1fr) 24px minmax(55px,1.2fr);gap:7px;font-size:10px}
 }
+
+.governance-table-wrap{width:100%;overflow-x:auto}
+.governance-table{width:100%;border-collapse:collapse;min-width:520px;font-size:11px}
+.governance-table th,.governance-table td{padding:11px 9px;border-bottom:1px solid #edf0ed;text-align:right;white-space:nowrap}
+.governance-table th{color:var(--muted);font-weight:800;background:#f8faf8}
+.governance-table td{font-variant-numeric:tabular-nums}
+.governance-table td:nth-child(3){font-weight:800;color:#315b41}
+.governance-workspace button:disabled,.governance-workspace select:disabled{opacity:.55;cursor:not-allowed}
