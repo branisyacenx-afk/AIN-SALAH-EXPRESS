@@ -281,3 +281,19 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .public-support-links a,.public-footer a{font-size:11px;color:inherit;text-decoration:none}
 .public-support-links a:hover,.public-footer a:hover{text-decoration:underline}
 @media(max-width:640px){.public-legal{padding:22px 16px;margin-bottom:16px}.public-legal p{font-size:12px}.public-legal h3{font-size:14px}.public-support-links{gap:10px}}
+
+
+/* Compact public navigation with an accessible dropdown for informational pages */
+.public-header{position:relative;z-index:30}
+.public-main-nav{display:flex;align-items:center;gap:clamp(12px,2vw,25px)}
+.public-main-nav>a,.public-more-menu>summary{font:inherit;font-size:12px;font-weight:700;color:inherit;text-decoration:none;white-space:nowrap;cursor:pointer;list-style:none}
+.public-more-menu{position:relative}
+.public-more-menu>summary::-webkit-details-marker{display:none}
+.public-more-menu>summary span{display:inline-block;margin-right:4px;color:#d98243;font-size:16px;transition:transform .18s ease}
+.public-more-menu[open]>summary span{transform:rotate(180deg)}
+.public-more-dropdown{position:absolute;top:calc(100% + 13px);right:0;min-width:220px;padding:8px;background:#fff;border:1px solid #e6ece6;border-radius:14px;box-shadow:0 16px 40px #152d201c;display:grid;gap:2px;z-index:60}
+.public-more-dropdown:before{content:"";position:absolute;right:20px;top:-6px;width:10px;height:10px;background:#fff;border-top:1px solid #e6ece6;border-right:1px solid #e6ece6;transform:rotate(-45deg)}
+.public-more-dropdown a{position:relative;display:block;padding:11px 12px;border-radius:9px;color:#31483b;text-decoration:none;font-size:12px;font-weight:650;white-space:nowrap}
+.public-more-dropdown a:hover,.public-more-dropdown a:focus-visible{background:#f3f7f2;color:#b96b36;outline:none}
+@media(max-width:760px){.public-main-nav{gap:10px;flex-wrap:wrap}.public-main-nav>a,.public-more-menu>summary{font-size:11px}.public-more-dropdown{right:auto;left:0;min-width:205px}}
+@media(max-width:520px){.public-header{align-items:center;flex-wrap:wrap}.public-main-nav{order:3;width:100%;justify-content:center;padding:9px 0 2px;border-top:1px solid #edf1ed}.public-more-dropdown{right:0;left:auto}.public-actions{margin-inline-start:auto}}
