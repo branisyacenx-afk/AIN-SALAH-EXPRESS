@@ -366,3 +366,50 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 @media(max-width:760px){.public-menu-trigger{min-width:43px;height:43px;padding:0 9px;border-radius:13px}.public-menu-trigger-label{font-size:10px}.public-menu-panel{right:0;min-width:min(300px,calc(100vw - 24px))}}
 @media(max-width:520px){.public-header nav.public-main-nav{order:0;width:auto;padding:0;border:0;margin-inline-start:auto}.public-menu-panel{right:0;top:calc(100% + 9px);width:min(300px,calc(100vw - 24px))}}
 @media(prefers-reduced-motion:reduce){.public-menu-panel{animation:none}.public-menu-trigger,.public-menu-panel>a{transition:none}}
+
+
+/* Contract governance workspace */
+.admin-contract-hub{display:grid;gap:18px}
+.contract-library-card{border:1px solid #e7eee7;background:linear-gradient(135deg,#fff 0%,#f8fbf7 100%)}
+.contract-template-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.contract-template-grid button{display:flex;flex-direction:column;align-items:flex-start;gap:10px;min-height:138px;padding:17px;border:1px solid #e5ece5;border-radius:16px;background:#fff;color:#244332;text-align:right;cursor:pointer;transition:transform .2s,border-color .2s,box-shadow .2s}
+.contract-template-grid button:hover{transform:translateY(-3px);border-color:#e7a16d;box-shadow:0 12px 28px #213a2610}
+.contract-template-grid button b{font-size:13px}
+.contract-template-grid button small{font-size:11px;line-height:1.8;color:#7c8b80}
+.contract-template-grid button span{margin-top:auto;font-size:10px;font-weight:800;color:#cf773e}
+.contract-filter-row{display:grid;grid-template-columns:2fr 1fr 1fr;gap:12px;align-items:end;margin:16px 0}
+.contract-filter-row label{display:grid;gap:7px;font-size:11px;font-weight:700;color:#53685a}
+.contract-filter-row input,.contract-filter-row select{width:100%;min-height:42px;border:1px solid #dfe8df;border-radius:11px;padding:9px 12px;background:#fff;color:#294334;font:inherit}
+.contract-record-card{border:1px solid #e9eee9;border-radius:15px;background:#fff}
+.contract-preview-shell{margin-top:20px;border:1px solid #e3ebe3}
+.ase-legal-document{max-width:920px;padding:34px 42px;border:1px solid #dce4dc;box-shadow:0 14px 45px #1c33200d;line-height:1.9}
+.legal-document-brand{display:flex;align-items:center;justify-content:center;gap:14px;padding:8px 0 22px;margin-bottom:22px;border-bottom:2px solid #e5eee5;text-align:right}
+.legal-document-brand img{width:78px;height:78px;object-fit:contain}
+.legal-document-brand div{display:grid;gap:5px}
+.legal-document-brand b{font-size:19px;letter-spacing:.5px;color:#234431}
+.legal-document-brand span{font-size:11px;color:#7c897f}
+.legal-auto-fields{padding:17px;margin:18px 0 25px;border:1px solid #e5ebe5;border-radius:12px;background:#f8faf7;break-inside:avoid}
+.legal-auto-fields h3{margin:0 0 12px;font-size:14px;color:#31523d}
+.legal-auto-fields>div{display:grid;grid-template-columns:140px 1fr 140px 1fr;gap:8px 12px;font-size:11px}
+.legal-auto-fields>div b{color:#6d7c70}
+.legal-auto-fields>div span{color:#263d2e;overflow-wrap:anywhere}
+.legal-auto-fields>p{margin:12px 0 0;font-size:10px;color:#9a6a42}
+.legal-document-body{direction:rtl;text-align:justify;color:#252d27}
+.legal-doc-title{text-align:center;font-size:18px;line-height:1.7;color:#213e2d;margin:20px 0 28px;break-after:avoid}
+.legal-doc-heading{font-size:14px;color:#2d6244;border-bottom:1px solid #e6ece6;padding-bottom:6px;margin:24px 0 10px;break-after:avoid}
+.legal-doc-subheading{font-size:12px;color:#345640;margin:18px 0 7px}
+.legal-doc-paragraph,.legal-doc-list{font-size:11px;line-height:2;margin:6px 0;overflow-wrap:anywhere}
+.legal-doc-list{padding-right:14px}
+.legal-doc-space{height:5px}
+.legal-document-footer{margin-top:28px;padding-top:16px;border-top:2px solid #dce7dc;font-size:11px}
+.legal-document-footer>p{font-size:10px;color:#657469}
+.legal-document-footer .signature-grid{margin-top:30px}
+.legal-document-footer>small{display:block;margin-top:15px;padding-top:10px;border-top:1px solid #e3e9e3;color:#8a684d;font-size:9px;line-height:1.8}
+.ops-control .admin-kpis{grid-template-columns:repeat(4,minmax(0,1fr))}
+.ops-control .ops-command-bar{position:sticky;top:8px;z-index:20;backdrop-filter:blur(14px);box-shadow:0 8px 28px #18352512}
+.ops-control>.admin-form-card,.ops-control>.admin-main-card{scroll-margin-top:86px}
+.ops-control .admin-form-card{border:1px solid #e7eee7;box-shadow:0 8px 24px #17352108}
+.ops-control .admin-card-head h2{display:flex;align-items:center;gap:8px}
+@media(max-width:900px){.contract-template-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.ops-control .admin-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.legal-auto-fields>div{grid-template-columns:120px 1fr}}
+@media(max-width:620px){.contract-filter-row{grid-template-columns:1fr}.contract-template-grid{grid-template-columns:1fr 1fr}.ase-legal-document{padding:20px 16px}.legal-document-brand img{width:58px;height:58px}.legal-document-brand b{font-size:15px}.legal-auto-fields>div{grid-template-columns:1fr 1fr;gap:7px}.contract-template-grid button{min-height:145px;padding:13px}.ops-control .admin-kpis{grid-template-columns:1fr 1fr}}
+@media print{.ase-legal-document{max-width:none!important;padding:10mm!important;border:0!important;box-shadow:none!important}.legal-document-brand{break-inside:avoid}.legal-auto-fields{break-inside:avoid}.legal-doc-heading{break-after:avoid}.legal-doc-paragraph,.legal-doc-list{orphans:3;widows:3}}
