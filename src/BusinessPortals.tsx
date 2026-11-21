@@ -65,7 +65,7 @@ export function AdminContractManager({background=false}:{background?:boolean}={}
   const {data:existing,error:existingError}=await supabase.from('work_contracts').select('subject_user_id').eq('contract_type','driver');
   if(existingError){M('تعذر فحص سجل العقود: '+existingError.message);return}
   const known=new Set((existing||[]).map((x:any)=>x.subject_user_id).filter(Boolean));
-  const missing=applications.filter((a:any)=>a.user_id&&!known.has(a.user_id));
+  const missing=applications.filter((a:any)=>a.user_id&&a.status!=='rejected'&&!known.has(a.user_id));
   if(!missing.length)return;
   const ids=[...new Set(missing.map((a:any)=>a.user_id))];
   const [{data:profiles},{data:userData}]=await Promise.all([supabase.from('profiles').select('id,full_name,phone').in('id',ids),supabase.functions.invoke('admin-provision',{body:{action:'list_users',page:1}})]);
