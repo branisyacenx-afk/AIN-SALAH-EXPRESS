@@ -547,3 +547,47 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .local-seo-footer-links{display:flex;gap:12px 22px;flex-wrap:wrap;justify-content:center;margin-top:22px}
 .local-seo-footer-links a{font-size:12px;color:var(--muted);text-decoration:underline;text-underline-offset:3px}
 @media(max-width:720px){.local-seo-content{margin:28px auto 38px;padding:0 15px}.local-seo-grid,.local-seo-details{grid-template-columns:1fr}.local-seo-grid article,.local-seo-details>div,.local-seo-faq{padding:16px}}
+
+
+/* Keep every administration destination reachable on narrow screens */
+@media(max-width:800px){
+  .app>header>nav{
+    order:3;
+    width:100%;
+    max-width:100%;
+    min-width:0;
+    display:flex;
+    flex-wrap:nowrap;
+    justify-content:flex-start;
+    gap:6px;
+    overflow-x:auto;
+    overflow-y:hidden;
+    padding:2px 0 7px;
+    scrollbar-width:thin;
+    -webkit-overflow-scrolling:touch;
+  }
+  .app>header>nav button{
+    flex:0 0 auto;
+    min-width:max-content;
+    white-space:nowrap;
+    padding:10px 13px;
+  }
+  .app>header>.brand{flex:0 0 auto}
+  .app>header>.account{margin-inline-start:auto;flex:0 0 auto}
+}
+@media(max-width:800px){
+  .ops-command-bar{
+    position:relative;
+    top:auto;
+    display:flex;
+    flex-wrap:nowrap;
+    justify-content:flex-start;
+    overflow-x:auto;
+    overflow-y:hidden;
+    gap:8px;
+    padding:10px;
+    scrollbar-width:thin;
+    -webkit-overflow-scrolling:touch;
+  }
+  .ops-command-bar button{flex:0 0 auto;white-space:nowrap}
+}
