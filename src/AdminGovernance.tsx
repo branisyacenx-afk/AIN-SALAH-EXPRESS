@@ -33,8 +33,8 @@ const rolePresets: Record<string, { label: string; description: string; permissi
   partner_manager: { label: 'مسؤول الشركاء', description: 'إدارة المتاجر والكتالوج ومتابعة أداء الشركاء', permissions: { 'dashboard.view': true, 'stores.view': true, 'stores.manage': true, 'catalog.view': true, 'catalog.manage': true, 'performance.view': true } },
   order_observer: { label: 'مراقب الطلبات', description: 'قراءة الطلبات ومؤشرات الجودة دون تعديلها', permissions: { 'dashboard.view': true, 'orders.view': true, 'quality.view': true } },
   finance_viewer: { label: 'مراقب مالي', description: 'قراءة التقارير والمدفوعات والسجلات المالية فقط', permissions: { 'dashboard.view': true, 'reports.view': true, 'finance.view': true } },
-  catalog_manager: { label: 'مسؤول الكتالوج', description: 'إدارة المنتجات والتصنيفات', permissions: { 'dashboard.view': true, 'catalog.manage': true } },
-  custom: { label: 'صلاحيات مخصصة', description: 'حدد الصلاحيات يدوياً حسب مسؤولية الموظف', permissions: { 'dashboard.view': true } }
+  catalog_manager: { label: 'مسؤول الكتالوج', description: 'إدارة المنتجات والتصنيفات', permissions: { 'dashboard.view': true, 'stores.view': true, 'catalog.manage': true } },
+  custom: { label: 'صلاحيات مخصصة', description: 'حدد الصلاحيات يدوياً حسب مسؤولية الموظف', permissions: {} }
 };
 
 const formatMoney = (value: number) => new Intl.NumberFormat('fr-DZ').format(Math.round(value || 0)) + ' دج';
@@ -108,7 +108,7 @@ export default function AdminGovernance({ view, currentUserId }: { view: Mode; c
           view === 'quality-admin' ? readAll('support_tickets', 'id,status,priority,created_at,updated_at') : Promise.resolve([]),
           view === 'finance-admin' ? readAll('financial_ledger', 'id,entity_type,entry_type,direction,amount_dzd,status,reference,created_at') : Promise.resolve([]),
           view === 'finance-admin' ? readAll('payments', 'id,order_id,method,status,amount_dzd,provider,created_at') : Promise.resolve([]),
-          view === 'finance-admin' ? readAll('settlement_requests', 'id,entity_type,status,amount_dzd,created_at') : Promise.resolve([])
+          view === 'finance-admin' ? readAll('settlement_requests', 'id,entity_type,status,amount_dzd,requested_at') : Promise.resolve([])
         ]);
         setOrders(o); setReviews(r); setStores(st); setDrivers(dp); setProfiles(prof as Profile[]); setTickets(tk); setLedger(fl); setPayments(py); setSettlements(sr);
       }
@@ -182,6 +182,7 @@ export default function AdminGovernance({ view, currentUserId }: { view: Mode; c
   async function addStaff(e: FormEvent) {
     e.preventDefault();
     if (!supabase || !selectedUser) return;
+    if (!Object.values(draftPermissions).some(Boolean)) { setError('اختر صلاحية واحدة على الأقل قبل حفظ الموظف.'); return; }
     setSaving(true); setNotice(''); setError('');
     const { error: saveError } = await supabase.from('admin_staff').upsert({
       user_id: selectedUser, role_key: roleKey, permissions: draftPermissions, is_active: true, created_by: currentUserId, updated_at: new Date().toISOString()
