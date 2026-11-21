@@ -591,3 +591,42 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
   }
   .ops-command-bar button{flex:0 0 auto;white-space:nowrap}
 }
+
+
+/* Always show the complete nine-section command center; no hidden horizontal menu */
+.ops-command-grid{
+  position:relative;
+  top:auto;
+  z-index:2;
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:10px;
+  padding:12px;
+  margin:14px 0 20px;
+  border:1px solid #dfe9e1;
+  border-radius:16px;
+  background:#fff;
+  box-shadow:0 8px 24px rgba(24,54,36,.06);
+}
+.ops-command-grid button{
+  display:flex;
+  min-width:0;
+  min-height:54px;
+  align-items:center;
+  justify-content:flex-start;
+  gap:9px;
+  padding:11px 13px;
+  border:1px solid #e5ece5;
+  border-radius:12px;
+  background:#f8fbf8;
+  color:#355744;
+  font-size:12px;
+  font-weight:800;
+  line-height:1.5;
+  text-align:right;
+  white-space:normal;
+  cursor:pointer;
+}
+.ops-command-grid button:active{background:#fff4eb;border-color:#efb184}
+@media(max-width:800px){.ops-command-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;padding:9px}.ops-command-grid button{min-height:58px;padding:10px;font-size:11px}}
+@media(max-width:360px){.ops-command-grid{grid-template-columns:1fr}}
