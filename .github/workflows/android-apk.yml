@@ -44,11 +44,15 @@ jobs:
           EXPO_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.EXPO_PUBLIC_SUPABASE_ANON_KEY }}
         run: npx expo prebuild --platform android --non-interactive
 
-      - name: Build native APK
+      - name: Build standalone release APK with embedded JavaScript
         working-directory: apps/mobile/android
         run: |
           chmod +x gradlew
-          ./gradlew assembleDebug
+          ./gradlew clean assembleRelease
+          APK="$(find app/build/outputs/apk/release -maxdepth 1 -type f -name '*.apk' | head -n 1)"
+          test -n "$APK"
+          mkdir -p ../../dist
+          cp "$APK" ../../dist/ain-salah-express-native.apk
 
       - name: Publish native APK
         working-directory: .
@@ -56,6 +60,6 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           TAG="native-android-v1.0.${{ github.run_number }}"
-          gh release create "$TAG" apps/mobile/android/app/build/outputs/apk/debug/app-debug.apk \
+          gh release create "$TAG" apps/mobile/dist/ain-salah-express-native.apk \
             --title "AIN SALAH EXPRESS Native Android ${TAG}" \
-            --notes "Native React Native Android application for customers and drivers. Uses the existing AIN SALAH EXPRESS Supabase project. Admin and merchant portals remain on the website."
+            --notes "Standalone React Native Android release APK with embedded JavaScript bundle. Customer and driver app. Admin and merchant portals remain on the website."
