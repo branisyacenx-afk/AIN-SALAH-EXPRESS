@@ -3,7 +3,7 @@ import type { FormEvent } from 'react';
 import { supabase } from './lib/supabase';
 import { Activity, AlertTriangle, BadgeCheck, BarChart3, CalendarDays, CheckCircle2, Clock3, Gauge, RefreshCw, Shield, ShieldCheck, Star, Store, Truck, Users, UserPlus, XCircle } from 'lucide-react';
 
-type Mode = 'permissions-admin' | 'reports-admin' | 'quality-admin' | 'performance-admin';
+type Mode = 'permissions-admin' | 'reports-admin' | 'quality-admin' | 'performance-admin' | 'finance-admin';
 type Period = 'day' | 'week' | 'month';
 type Row = Record<string, any>;
 type Staff = { user_id: string; role_key: string; permissions: Record<string, boolean>; is_active: boolean; created_at: string };
@@ -20,16 +20,10 @@ const permissionLabels: Record<string, string> = {
   'stores.manage': 'إدارة المتاجر والشركاء',
   'drivers.view': 'عرض السائقين ومواقعهم',
   'drivers.manage': 'إدارة السائقين وطلبات الانضمام',
-  'users.view': 'عرض بيانات المستخدمين',
-  'catalog.view': 'عرض المنتجات والتصنيفات',
   'catalog.manage': 'إدارة المنتجات والتصنيفات',
   'settings.manage': 'إعدادات المنصة والتسعير والمناطق',
   'contracts.manage': 'العقود والوثائق القانونية',
-  'finance.view': 'عرض المدفوعات والسجلات المالية',
-  'notifications.manage': 'إدارة الإشعارات',
-  'promotions.manage': 'إدارة القسائم والعروض',
-  'audit.view': 'قراءة سجل التدقيق',
-  'support.manage': 'إدارة تذاكر الدعم'
+  'finance.view': 'عرض المدفوعات والسجلات المالية'
 };
 
 const rolePresets: Record<string, { label: string; description: string; permissions: Record<string, boolean> }> = {
@@ -37,9 +31,9 @@ const rolePresets: Record<string, { label: string; description: string; permissi
   dispatch_manager: { label: 'مسؤول التوصيل', description: 'متابعة الطلبات والسائقين والإسناد', permissions: { 'dashboard.view': true, 'orders.view': true, 'orders.manage': true, 'drivers.view': true, 'drivers.manage': true, 'performance.view': true } },
   quality_auditor: { label: 'مراقب الجودة', description: 'قراءة التقييمات ومؤشرات الجودة والتقارير دون تعديل العمليات', permissions: { 'dashboard.view': true, 'reports.view': true, 'quality.view': true, 'performance.view': true, 'orders.view': true } },
   partner_manager: { label: 'مسؤول الشركاء', description: 'إدارة المتاجر والكتالوج ومتابعة أداء الشركاء', permissions: { 'dashboard.view': true, 'stores.view': true, 'stores.manage': true, 'catalog.view': true, 'catalog.manage': true, 'performance.view': true } },
-  support_agent: { label: 'موظف الدعم', description: 'قراءة الطلبات ومتابعة الجودة وتذاكر الدعم', permissions: { 'dashboard.view': true, 'orders.view': true, 'quality.view': true, 'support.manage': true } },
+  order_observer: { label: 'مراقب الطلبات', description: 'قراءة الطلبات ومؤشرات الجودة دون تعديلها', permissions: { 'dashboard.view': true, 'orders.view': true, 'quality.view': true } },
   finance_viewer: { label: 'مراقب مالي', description: 'قراءة التقارير والمدفوعات والسجلات المالية فقط', permissions: { 'dashboard.view': true, 'reports.view': true, 'finance.view': true } },
-  catalog_manager: { label: 'مسؤول الكتالوج', description: 'إدارة المنتجات والتصنيفات والعروض', permissions: { 'dashboard.view': true, 'catalog.view': true, 'catalog.manage': true, 'promotions.manage': true } },
+  catalog_manager: { label: 'مسؤول الكتالوج', description: 'إدارة المنتجات والتصنيفات', permissions: { 'dashboard.view': true, 'catalog.manage': true } },
   custom: { label: 'صلاحيات مخصصة', description: 'حدد الصلاحيات يدوياً حسب مسؤولية الموظف', permissions: { 'dashboard.view': true } }
 };
 
@@ -82,6 +76,9 @@ export default function AdminGovernance({ view, currentUserId }: { view: Mode; c
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [staff, setStaff] = useState<Staff[]>([]);
   const [tickets, setTickets] = useState<Row[]>([]);
+  const [ledger, setLedger] = useState<Row[]>([]);
+  const [payments, setPayments] = useState<Row[]>([]);
+  const [settlements, setSettlements] = useState<Row[]>([]);
   const [selectedUser, setSelectedUser] = useState('');
   const [roleKey, setRoleKey] = useState('operations_manager');
   const [draftPermissions, setDraftPermissions] = useState<Record<string, boolean>>(rolePresets.operations_manager.permissions);
@@ -102,15 +99,18 @@ export default function AdminGovernance({ view, currentUserId }: { view: Mode; c
         setProfiles((p.data || []) as Profile[]);
         setStaff((s.data || []) as Staff[]);
       } else {
-        const [o, r, st, dp, prof, tk] = await Promise.all([
+        const [o, r, st, dp, prof, tk, fl, py, sr] = await Promise.all([
           readAll('orders', 'id,order_number,status,total_amount,created_at,delivered_at,accepted_at,driver_id,store_id'),
           readAll('reviews', 'id,order_id,rating,comment,driver_id,store_id,created_at'),
           readAll('stores', 'id,name,is_active,created_at'),
           readAll('driver_profiles', 'user_id,vehicle_type,is_approved,is_online,is_suspended,created_at'),
           readAll('profiles', 'id,full_name,phone'),
-          view === 'quality-admin' ? readAll('support_tickets', 'id,status,priority,created_at,updated_at') : Promise.resolve([])
+          view === 'quality-admin' ? readAll('support_tickets', 'id,status,priority,created_at,updated_at') : Promise.resolve([]),
+          view === 'finance-admin' ? readAll('financial_ledger', 'id,entity_type,entry_type,direction,amount_dzd,status,reference,created_at') : Promise.resolve([]),
+          view === 'finance-admin' ? readAll('payments', 'id,order_id,method,status,amount_dzd,provider,created_at') : Promise.resolve([]),
+          view === 'finance-admin' ? readAll('settlement_requests', 'id,entity_type,status,amount_dzd,created_at') : Promise.resolve([])
         ]);
-        setOrders(o); setReviews(r); setStores(st); setDrivers(dp); setProfiles(prof as Profile[]); setTickets(tk);
+        setOrders(o); setReviews(r); setStores(st); setDrivers(dp); setProfiles(prof as Profile[]); setTickets(tk); setLedger(fl); setPayments(py); setSettlements(sr);
       }
     } catch (e: any) {
       setError(e?.message || 'تعذر تحميل بيانات مركز الإدارة. تحقق من صلاحيات الحساب والاتصال.');
@@ -211,7 +211,7 @@ export default function AdminGovernance({ view, currentUserId }: { view: Mode; c
   }
 
   const periodLabel = period === 'day' ? 'اليوم' : period === 'week' ? 'هذا الأسبوع' : 'هذا الشهر';
-  const title = view === 'permissions-admin' ? 'إدارة الصلاحيات وفريق الإدارة' : view === 'reports-admin' ? 'التقارير الزمنية' : view === 'quality-admin' ? 'مركز جودة الخدمة' : 'أداء السائقين والمتاجر';
+  const title = view === 'permissions-admin' ? 'إدارة الصلاحيات وفريق الإدارة' : view === 'reports-admin' ? 'التقارير الزمنية' : view === 'quality-admin' ? 'مركز جودة الخدمة' : view === 'finance-admin' ? 'مركز المتابعة المالية' : 'أداء السائقين والمتاجر';
 
   return <section className="admin-workspace governance-workspace" dir="rtl">
     <div className="admin-welcome">
@@ -291,6 +291,27 @@ export default function AdminGovernance({ view, currentUserId }: { view: Mode; c
       </div>
     </>}
 
+    {view === 'finance-admin' && <>
+      <div className="admin-kpis governance-kpis">
+        <article><span>حركات السجل المالي</span><b>{ledger.length}</b><small>كل السجلات المتاحة</small></article>
+        <article><span>مجموع الحركات المدينة</span><b>{formatMoney(ledger.filter(x => x.direction === 'debit').reduce((sum,x) => sum + Number(x.amount_dzd || 0),0))}</b><small>حسب اتجاه السجل</small></article>
+        <article><span>مجموع الحركات الدائنة</span><b>{formatMoney(ledger.filter(x => x.direction === 'credit').reduce((sum,x) => sum + Number(x.amount_dzd || 0),0))}</b><small>حسب اتجاه السجل</small></article>
+        <article><span>سجلات المدفوعات</span><b>{payments.length}</b><small>لا تعني أن الدفع الإلكتروني مفعل</small></article>
+        <article><span>طلبات التسوية</span><b>{settlements.length}</b><small>كل الحالات المسجلة</small></article>
+      </div>
+      <div className="governance-two-col">
+        <article className="governance-panel"><div className="governance-section-head"><div><span className="eyebrow">FINANCIAL LEDGER</span><h2>آخر الحركات المالية</h2></div></div>
+          <div className="governance-table-wrap"><table className="governance-table"><thead><tr><th>النوع</th><th>الاتجاه</th><th>المبلغ</th><th>الحالة</th><th>التاريخ</th></tr></thead><tbody>{[...ledger].sort((a,b)=>new Date(b.created_at).getTime()-new Date(a.created_at).getTime()).slice(0,30).map(x=><tr key={x.id}><td>{x.entry_type || x.entity_type}</td><td>{x.direction === 'credit' ? 'دائن' : x.direction === 'debit' ? 'مدين' : x.direction}</td><td>{formatMoney(Number(x.amount_dzd || 0))}</td><td>{x.status}</td><td>{formatDate(x.created_at)}</td></tr>)}</tbody></table></div>
+          {!ledger.length && <div className="governance-empty">لا توجد حركات مالية مسجلة حالياً.</div>}
+        </article>
+        <article className="governance-panel"><div className="governance-section-head"><div><span className="eyebrow">PAYMENT & SETTLEMENT STATUS</span><h2>المدفوعات والتسويات</h2></div></div>
+          <div className="governance-alert-line"><BadgeCheck size={17}/><span>مدفوعات ناجحة</span><b>{payments.filter(x => ['paid','succeeded','completed'].includes(String(x.status).toLowerCase())).length}</b></div>
+          <div className="governance-alert-line"><Clock3 size={17}/><span>مدفوعات قيد المتابعة</span><b>{payments.filter(x => !['paid','succeeded','completed','failed','cancelled'].includes(String(x.status).toLowerCase())).length}</b></div>
+          <div className="governance-alert-line"><AlertTriangle size={17}/><span>تسويات بانتظار المعالجة</span><b>{settlements.filter(x => !['paid','completed','rejected','cancelled'].includes(String(x.status).toLowerCase())).length}</b></div>
+          <p className="governance-footnote">هذه الشاشة للقراءة والمراجعة فقط. لا تنفذ دفعاً أو تحويلاً مالياً ولا تستنتج ربحاً صافياً من الحركات وحدها.</p>
+        </article>
+      </div>
+    </>}
     {view === 'performance-admin' && <>
       <div className="governance-section-head"><div><span className="eyebrow">DELIVERY PARTNER SCORECARD</span><h2>أداء السائقين</h2><p>الإنجازات والتقييمات المسجلة لكل سائق. لا تُحتسب ساعات العمل أو المسافات غير المسجلة.</p></div><span className="governance-count"><Truck size={15}/>{drivers.length} سائق</span></div>
       <div className="governance-performance-list">{driverPerformance.map(d => <article className="governance-performance-card" key={d.user_id}><div className="governance-performance-title"><div className="governance-avatar"><Truck size={19}/></div><div><b>{d.name}</b><small>{d.phone || d.vehicle_type || 'سائق توصيل'}</small></div><span className={d.is_suspended ? 'status-paused' : d.is_online ? 'status-active' : 'status-idle'}>{d.is_suspended ? 'موقوف' : d.is_online ? 'متصل' : 'غير متصل'}</span></div><div className="governance-performance-stats"><span><b>{d.done}</b><small>طلبات مكتملة</small></span><span><b>{d.assigned}</b><small>طلبات مسندة</small></span><span><b>{d.ratingCount ? d.rating.toFixed(1) + '/5' : '—'}</b><small>التقييم · {d.ratingCount}</small></span><span><b>{d.completion.toFixed(0)}%</b><small>إتمام المسند</small></span></div></article>)}{!drivers.length && <div className="governance-empty">لا يوجد سائقون مسجلون حالياً. سيظهر الأداء بعد تسجيل السائقين وبدء الطلبات.</div>}</div>
