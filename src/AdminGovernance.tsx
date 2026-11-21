@@ -100,17 +100,17 @@ export default function AdminGovernance({ view, currentUserId }: { view: Mode; c
         setStaff((s.data || []) as Staff[]);
       } else {
         const [o, r, st, dp, prof, tk, fl, py, sr] = await Promise.all([
-          readAll('orders', 'id,order_number,status,total_amount,subtotal_dzd,created_at,delivered_at,accepted_at,driver_id,store_id'),
+          readAll('admin_governance_orders', 'id,order_number,status,total_amount,subtotal_dzd,created_at,delivered_at,accepted_at,driver_id,store_id'),
           readAll('reviews', 'id,order_id,rating,comment,driver_id,store_id,created_at'),
-          readAll('stores', 'id,name,is_active,created_at'),
-          readAll('driver_profiles', 'user_id,vehicle_type,is_approved,is_online,is_suspended,created_at'),
-          readAll('profiles', 'id,full_name,phone'),
+          view === 'performance-admin' ? readAll('admin_performance_stores', 'id,name,is_active') : Promise.resolve([]),
+          view === 'performance-admin' ? readAll('admin_performance_driver_directory', 'user_id,full_name,vehicle_type,is_approved,is_online,is_suspended,created_at') : Promise.resolve([]),
+          Promise.resolve([]),
           view === 'quality-admin' ? readAll('support_tickets', 'id,status,priority,created_at,updated_at') : Promise.resolve([]),
           view === 'finance-admin' ? readAll('financial_ledger', 'id,entity_type,entry_type,direction,amount_dzd,status,reference,created_at') : Promise.resolve([]),
           view === 'finance-admin' ? readAll('payments', 'id,order_id,method,status,amount_dzd,provider,created_at') : Promise.resolve([]),
           view === 'finance-admin' ? readAll('settlement_requests', 'id,entity_type,status,amount_dzd,requested_at') : Promise.resolve([])
         ]);
-        setOrders(o); setReviews(r); setStores(st); setDrivers(dp); setProfiles(prof as Profile[]); setTickets(tk); setLedger(fl); setPayments(py); setSettlements(sr);
+        setOrders(o); setReviews(r); setStores(st); setDrivers(dp); setProfiles(dp.map(d => ({ id: d.user_id, full_name: d.full_name || 'سائق', phone: null })) as Profile[]); setTickets(tk); setLedger(fl); setPayments(py); setSettlements(sr);
       }
     } catch (e: any) {
       setError(e?.message || 'تعذر تحميل بيانات مركز الإدارة. تحقق من صلاحيات الحساب والاتصال.');
