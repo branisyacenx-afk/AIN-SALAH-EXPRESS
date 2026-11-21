@@ -179,7 +179,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .install-app-button:disabled{opacity:.75;cursor:default}
 .install-app-button span{font-size:17px;line-height:12px}
 .install-app-hint{position:absolute;top:calc(100% + 9px);right:0;z-index:30;width:min(290px,82vw);padding:11px 13px;border:1px solid #dce8dd;border-radius:12px;background:#fff;color:#405548;box-shadow:0 10px 30px #172b201c;font-size:11px;line-height:1.8}
-@media(max-width:760px){.public-header{height:auto;min-height:76px;padding:12px 14px;gap:8px;flex-wrap:wrap}.public-header nav{display:none}.public-actions{gap:6px;flex-wrap:wrap}.public-actions .primary,.public-login,.install-app-button{padding:9px 11px;font-size:10px}.install-app-wrap{order:-1}.install-app-hint{right:auto;left:0}}
+@media(max-width:760px){.public-header{height:auto;min-height:76px;padding:12px 14px;gap:8px;flex-wrap:wrap}.public-header nav.public-main-nav{display:flex;align-items:center;justify-content:center}.public-actions{gap:6px;flex-wrap:wrap}.public-actions .primary,.public-login,.install-app-button{padding:9px 11px;font-size:10px}.install-app-wrap{order:-1}.install-app-hint{right:auto;left:0}}
 
 /* In-app support desk */
 .support-center{display:grid;gap:18px;padding:22px 0;color:#263d30}
@@ -297,3 +297,15 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .public-more-dropdown a:hover,.public-more-dropdown a:focus-visible{background:#f3f7f2;color:#b96b36;outline:none}
 @media(max-width:760px){.public-main-nav{gap:10px;flex-wrap:wrap}.public-main-nav>a,.public-more-menu>summary{font-size:11px}.public-more-dropdown{right:auto;left:0;min-width:205px}}
 @media(max-width:520px){.public-header{align-items:center;flex-wrap:wrap}.public-main-nav{order:3;width:100%;justify-content:center;padding:9px 0 2px;border-top:1px solid #edf1ed}.public-more-dropdown{right:0;left:auto}.public-actions{margin-inline-start:auto}}
+
+
+/* Three-dot overflow menu in the top site header */
+.public-header nav.public-main-nav{display:flex;align-items:center;margin-inline-start:auto}
+.public-more-menu>summary{display:grid;place-items:center;width:42px;height:42px;border:1px solid #e3eae3;border-radius:13px;background:#fff;color:#294638;cursor:pointer;list-style:none;box-shadow:0 3px 12px #1b33200a}
+.public-more-menu>summary::-webkit-details-marker{display:none}
+.public-more-menu>summary span{font-size:28px;line-height:1;font-weight:800;letter-spacing:1px;color:#315440}
+.public-more-menu[open]>summary{background:#f1f7f1;border-color:#cbdccb}
+.public-more-dropdown{top:calc(100% + 10px);right:0;left:auto;min-width:245px}
+.public-more-dropdown a{font-size:12px;padding:12px 13px}
+.public-more-dropdown .public-menu-contracts{margin-top:5px;border-top:1px solid #edf1ed;border-radius:0 0 9px 9px;color:#b96b36;font-weight:800}
+@media(max-width:760px){.public-header nav.public-main-nav{display:flex;order:0;width:auto;padding:0;border:0;margin-inline-start:auto}.public-more-menu>summary{width:40px;height:40px}.public-more-dropdown{right:0;left:auto;min-width:min(260px,84vw)}}
