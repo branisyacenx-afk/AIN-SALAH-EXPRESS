@@ -60,6 +60,6 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           TAG="native-android-v1.0.${{ github.run_number }}"
-          gh release create "$TAG" apps/mobile/dist/ain-salah-express-native.apk \
+          gh release create "$TAG" apps/dist/ain-salah-express-native.apk \
             --title "AIN SALAH EXPRESS Native Android ${TAG}" \
             --notes "Standalone React Native Android release APK with embedded JavaScript bundle. Customer and driver app. Admin and merchant portals remain on the website."
