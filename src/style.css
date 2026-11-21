@@ -426,3 +426,91 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .admin-reports .report-side-stat b{font-size:17px;font-variant-numeric:tabular-nums;color:#244b38}
 @media(max-width:800px){.app>header nav{order:3;width:100%;max-width:100%;justify-content:flex-start;padding-bottom:4px}.app>header nav button{flex:0 0 auto;padding:9px 12px;font-size:11px}.admin-reports .admin-columns{grid-template-columns:1fr}}
 @media(max-width:480px){.admin-reports .admin-kpis{grid-template-columns:1fr 1fr}.admin-reports .admin-welcome{align-items:flex-start;gap:12px;flex-direction:column}.admin-reports .report-status-row>div:first-child{font-size:11px}}
+
+/* Advanced admin governance: access control, reporting, quality and scorecards */
+.governance-workspace{display:grid;gap:20px;padding-bottom:36px}
+.governance-workspace .admin-welcome{align-items:center}
+.admin-refresh{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:12px;padding:11px 15px;font-weight:800;cursor:pointer}
+.admin-refresh:disabled{opacity:.55;cursor:wait}
+.governance-alert,.governance-notice{display:flex;align-items:center;gap:9px;padding:12px 14px;border-radius:12px;font-size:13px;font-weight:700}
+.governance-alert{background:#fff2ed;color:#a33f24;border:1px solid #f3c7b9}
+.governance-notice{background:#eef8f0;color:#24633b;border:1px solid #c9e6d0}
+.governance-loading{font-size:12px;color:var(--muted);padding:4px 2px}
+.governance-section-head{display:flex;align-items:center;justify-content:space-between;gap:14px;margin:8px 0 0}
+.governance-section-head h2{font-size:19px;margin:4px 0}
+.governance-section-head p{font-size:12px;color:var(--muted);margin:5px 0 0;line-height:1.7}
+.governance-count{display:inline-flex;align-items:center;gap:7px;padding:8px 11px;border-radius:999px;background:#f2f5f2;color:#31533e;font-size:12px;font-weight:800;white-space:nowrap}
+.governance-panel{background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:0 8px 26px #1b38200a}
+.governance-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.governance-form-grid label{display:grid;gap:7px;font-size:12px;font-weight:800}
+.governance-form-grid select{width:100%;min-height:44px;border:1px solid var(--line);border-radius:10px;background:#fff;padding:9px 11px;color:var(--ink);font:inherit}
+.governance-role-description{font-size:12px;color:var(--muted);line-height:1.7;margin:12px 0}
+.governance-permission-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:14px 0 18px}
+.governance-permission{display:flex;align-items:flex-start;gap:9px;padding:10px;border:1px solid var(--line);border-radius:10px;font-size:11px;line-height:1.5;cursor:pointer}
+.governance-permission input{accent-color:#286746;margin-top:2px}
+.governance-staff-list,.governance-performance-list{display:grid;gap:11px}
+.governance-staff-card,.governance-performance-card{background:#fff;border:1px solid var(--line);border-radius:15px;padding:15px;display:grid;gap:12px}
+.governance-staff-identity,.governance-performance-title{display:flex;align-items:center;gap:11px;min-width:0}
+.governance-staff-identity>div:nth-child(2),.governance-performance-title>div:nth-child(2){display:grid;gap:4px;min-width:0}
+.governance-staff-identity b,.governance-performance-title b{font-size:14px}
+.governance-staff-identity small,.governance-performance-title small{font-size:11px;color:var(--muted);overflow-wrap:anywhere}
+.governance-avatar{width:38px;height:38px;flex:0 0 38px;display:grid;place-items:center;border-radius:12px;background:#f1f5f1;color:#315b41}
+.governance-staff-meta{display:flex;align-items:center;gap:10px;font-size:11px;color:var(--muted)}
+.status-active,.status-paused,.status-idle{display:inline-flex;padding:5px 9px;border-radius:999px;font-size:10px;font-weight:800}
+.status-active{background:#e9f7ee;color:#23633c}
+.status-paused{background:#fff0ed;color:#a6402b}
+.status-idle{background:#f1f3f4;color:#59636a}
+.governance-staff-actions{display:flex;gap:9px;flex-wrap:wrap}
+.governance-staff-actions button{border:1px solid var(--line);border-radius:9px;background:#fff;padding:8px 11px;font-size:11px;font-weight:800;cursor:pointer}
+.governance-staff-actions .danger-link{color:#a6402b}
+.governance-empty{padding:25px 15px;text-align:center;color:var(--muted);background:#f8faf8;border:1px dashed #d7e0d8;border-radius:13px;font-size:12px;line-height:1.8}
+.governance-period-switch{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.governance-period-switch button{border:1px solid var(--line);background:#fff;border-radius:10px;padding:9px 15px;font-size:12px;font-weight:800;cursor:pointer}
+.governance-period-switch button.active{background:#244f38;color:#fff;border-color:#244f38}
+.governance-period-switch span{margin-inline-start:auto;display:flex;align-items:center;gap:7px;font-size:12px;color:var(--muted)}
+.governance-kpis{grid-template-columns:repeat(auto-fit,minmax(145px,1fr))}
+.governance-chart{display:flex;align-items:stretch;gap:5px;height:190px;padding:18px 4px 0;border-bottom:1px solid var(--line);overflow:hidden}
+.governance-chart-col{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:8px}
+.governance-chart-bars{height:155px;width:min(100%,24px);display:flex;align-items:flex-end;justify-content:center;gap:2px}
+.governance-chart-bars i,.governance-chart-bars b{display:block;flex:1;min-height:2px;border-radius:5px 5px 0 0;background:#eaa16e}
+.governance-chart-bars b{background:#376c4c}
+.governance-chart-col small{height:15px;font-size:9px;color:var(--muted)}
+.governance-chart-legend{display:flex;gap:16px;margin-top:12px;font-size:10px;color:var(--muted)}
+.governance-chart-legend span{display:flex;align-items:center;gap:6px}
+.governance-chart-legend i{width:8px;height:8px;border-radius:50%;background:#eaa16e}
+.governance-chart-legend span+span i{background:#376c4c}
+.governance-breakdown-row{display:grid;grid-template-columns:minmax(95px,1fr) 32px minmax(80px,2fr);align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #edf0ed;font-size:12px}
+.governance-breakdown-row b{text-align:center;font-variant-numeric:tabular-nums}
+.governance-breakdown-row>i{height:8px;background:#f0f2f0;border-radius:20px;overflow:hidden}
+.governance-breakdown-row>i em{display:block;height:100%;background:#4d8060;border-radius:20px}
+.governance-two-col{display:grid;grid-template-columns:1.2fr .8fr;gap:14px}
+.governance-review{padding:12px 0;border-bottom:1px solid #edf0ed}
+.governance-review>div{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.governance-review b{color:#c47a2d;letter-spacing:1px}
+.governance-review small,.governance-review>span{font-size:10px;color:var(--muted)}
+.governance-review p{font-size:12px;line-height:1.7;margin:7px 0}
+.governance-alert-line{display:flex;align-items:center;gap:9px;padding:13px 0;border-bottom:1px solid #edf0ed;font-size:12px}
+.governance-alert-line svg{color:#b56c36;flex:0 0 auto}
+.governance-alert-line span{flex:1}
+.governance-alert-line b{font-variant-numeric:tabular-nums}
+.governance-footnote{font-size:11px;color:var(--muted);line-height:1.8;margin:13px 0 0}
+.governance-performance-title>span{margin-inline-start:auto}
+.governance-performance-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.governance-performance-stats>span{display:grid;gap:5px;padding:10px;border-radius:10px;background:#f7f9f7;min-width:0}
+.governance-performance-stats b{font-size:15px;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+.governance-performance-stats small{font-size:10px;color:var(--muted);line-height:1.5}
+@media(max-width:760px){
+ .governance-workspace{gap:14px}
+ .governance-workspace .admin-welcome{align-items:flex-start;flex-direction:column}
+ .governance-form-grid,.governance-two-col{grid-template-columns:1fr}
+ .governance-permission-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .governance-performance-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .governance-period-switch span{width:100%;margin:4px 0 0}
+ .governance-panel{padding:15px}
+}
+@media(max-width:420px){
+ .governance-permission-grid{grid-template-columns:1fr}
+ .governance-chart{gap:2px;height:155px}
+ .governance-chart-bars{height:120px;width:15px}
+ .governance-breakdown-row{grid-template-columns:minmax(75px,1fr) 24px minmax(55px,1.2fr);gap:7px;font-size:10px}
+}
