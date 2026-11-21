@@ -116,13 +116,30 @@
   </head>
   <body>
     <div id="root"></div>
-    <noscript>
-      <main lang="ar-DZ" dir="rtl">
-        <h1>عين صالح إكسبريس — منصة التوصيل المحلية في عين صالح</h1>
-        <p>اكتشف المطاعم والمتاجر والوجبات والمنتجات المحلية في عين صالح، الجزائر. اطلب بسهولة وتابع مراحل تجهيز وتوصيل طلبك عبر منصة عين صالح إكسبريس.</p>
-        <p>تجمع المنصة الزبائن والمتاجر والسائقين في تجربة رقمية واحدة، مع خدمات تتوسع حسب الشركاء والتغطية المتاحة.</p>
-      </main>
-    </noscript>
+    <main class="seo-fallback" lang="ar-DZ" dir="rtl" aria-label="معلومات عين صالح إكسبريس">
+      <section>
+        <p><strong>AIN SALAH EXPRESS · عين صالح، الجزائر</strong></p>
+        <h1>عين صالح إكسبريس — منصة التوصيل في عين صالح</h1>
+        <p>عين صالح إكسبريس منصة محلية تساعد سكان عين صالح على اكتشاف المتاجر والمنتجات المتاحة، وإرسال الطلبات من الهاتف، ومتابعة مراحل التجهيز والتوصيل. تربط المنصة الزبائن بالمتاجر والسائقين ضمن تجربة طلب واضحة، وفق التوفر الفعلي ونطاق الخدمة.</p>
+        <h2>كيف تطلب من المتاجر في عين صالح؟</h2>
+        <ol><li>تصفح المتاجر والمنتجات المتاحة في المنصة.</li><li>اختر المنتجات والكميات وراجع تفاصيل طلبك.</li><li>أدخل رقم هاتفك وعنوان التسليم بدقة وأرسل الطلب.</li><li>تابع تأكيد المتجر وتجهيز الطلب ومراحل التوصيل من حسابك.</li></ol>
+        <h2>توصيل محلي ومتابعة الطلبات</h2>
+        <p>الخدمة موجهة أساساً إلى مدينة عين صالح بولاية عين صالح في الجزائر. يعتمد قبول الطلب على توفر المتجر والسائق والمنطقة والعنوان وقت الطلب. تظهر معلومات التتبع وموقع السائق عندما يتم إسناد الطلب وتكون تحديثات الموقع متاحة.</p>
+        <p>استخدم المنصة من متصفح الهاتف أو الكمبيوتر، واكتشف <a href="/ain-salah-delivery/">دليل خدمة التوصيل في عين صالح</a> لمعرفة خطوات الطلب ونطاق الخدمة والأسئلة الشائعة.</p>
+        <h2>معلومات ومساعدة</h2>
+        <p><a href="/about/">من نحن</a> · <a href="/contact/">اتصل بنا</a> · <a href="/delivery-policy/">سياسة التوصيل</a> · <a href="/privacy/">سياسة الخصوصية</a> · <a href="/terms/">شروط الاستخدام</a></p>
+      </section>
+    </main>
+    <style>
+      .seo-fallback{max-width:1040px;margin:24px auto;padding:24px 20px;color:#29352c;font-family:Tahoma,Arial,sans-serif;line-height:1.9}
+      .seo-fallback section{background:#fff;border:1px solid #e5e9e4;border-radius:16px;padding:clamp(18px,4vw,34px)}
+      .seo-fallback h1{font-size:clamp(25px,4vw,38px);line-height:1.5;margin:8px 0}
+      .seo-fallback h2{font-size:19px;margin:22px 0 5px}
+      .seo-fallback p,.seo-fallback li{font-size:14px;color:#566158}
+      .seo-fallback a{color:#286044;font-weight:700}
+      #root:not(:empty)+.seo-fallback{display:none}
+      @media(max-width:600px){.seo-fallback{margin:12px auto;padding:12px}.seo-fallback section{border-radius:12px}}
+    </style>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
