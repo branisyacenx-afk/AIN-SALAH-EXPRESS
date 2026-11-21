@@ -106,7 +106,7 @@ export default function App() {
       });
     }
     begin();
-    return () => { active = false; subscription?.remove(); };
+    return () => { active = false; subscription?.remove(); if (tracking && isDriver && uid && supabase) { void supabase.from('driver_locations').update({ is_available: false, updated_at: new Date().toISOString() }).eq('driver_id', uid); } };
   }, [tracking, isDriver, uid]);
 
   async function authenticate() {
