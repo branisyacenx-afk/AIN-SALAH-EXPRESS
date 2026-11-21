@@ -80,6 +80,7 @@ export default function AdminGovernance({ view, currentUserId }: { view: Mode; c
   const [payments, setPayments] = useState<Row[]>([]);
   const [settlements, setSettlements] = useState<Row[]>([]);
   const [selectedUser, setSelectedUser] = useState('');
+  const [editingUserId, setEditingUserId] = useState<string | null>(null);
   const [roleKey, setRoleKey] = useState('operations_manager');
   const [draftPermissions, setDraftPermissions] = useState<Record<string, boolean>>(rolePresets.operations_manager.permissions);
   const [saving, setSaving] = useState(false);
@@ -119,7 +120,7 @@ export default function AdminGovernance({ view, currentUserId }: { view: Mode; c
 
   useEffect(() => { void load(); }, [view, period]);
 
-  const availableProfiles = useMemo(() => profiles.filter(p => p.id !== currentUserId && !staff.some(s => s.user_id === p.id)), [profiles, staff, currentUserId]);
+  const availableProfiles = useMemo(() => profiles.filter(p => p.id !== currentUserId && (!staff.some(s => s.user_id === p.id) || p.id === editingUserId)), [profiles, staff, currentUserId, editingUserId]);
   const periodData = useMemo(() => {
     const { start, end } = periodBounds(period);
     return orders.filter(o => {
@@ -190,8 +191,18 @@ export default function AdminGovernance({ view, currentUserId }: { view: Mode; c
       user_id: selectedUser, role_key: roleKey, permissions: draftPermissions, is_active: true, created_by: currentUserId, updated_at: new Date().toISOString()
     }, { onConflict: 'user_id' });
     if (saveError) setError('تعذر حفظ الموظف: ' + saveError.message);
-    else { setNotice('تم حفظ صلاحيات الموظف. ستُطبّق الصلاحيات عند تحديث الجلسة أو إعادة تسجيل الدخول.'); setSelectedUser(''); await load(); }
+    else { setNotice('تم حفظ صلاحيات الموظف. ستُطبّق الصلاحيات عند تحديث الجلسة أو إعادة تسجيل الدخول.'); setSelectedUser(''); setEditingUserId(null); await load(); }
     setSaving(false);
+  }
+
+  function editStaffMember(member: Staff) {
+    setSelectedUser(member.user_id);
+    setEditingUserId(member.user_id);
+    setRoleKey(rolePresets[member.role_key] ? member.role_key : 'custom');
+    setDraftPermissions({ ...(member.permissions || {}) });
+    setNotice('تعديل صلاحيات الموظف المحدد. احفظ التغييرات لاعتمادها.');
+    setError('');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   async function setStaffActive(userId: string, active: boolean) {
@@ -234,7 +245,7 @@ export default function AdminGovernance({ view, currentUserId }: { view: Mode; c
         </div>
         <p className="governance-role-description">{rolePresets[roleKey].description}</p>
         <div className="governance-permission-grid">{Object.entries(permissionLabels).map(([key, label]) => <label key={key} className="governance-permission"><input type="checkbox" checked={Boolean(draftPermissions[key])} onChange={e => { setRoleKey('custom'); setDraftPermissions(p => ({ ...p, [key]: e.target.checked })); }}/><span>{label}</span></label>)}</div>
-        <button className="primary" type="submit" disabled={saving || !selectedUser}><UserPlus size={16}/>{saving ? 'جارٍ الحفظ…' : 'حفظ الموظف والصلاحيات'}</button>
+        <div className="governance-form-actions"><button className="primary" type="submit" disabled={saving || !selectedUser}><UserPlus size={16}/>{saving ? 'جارٍ الحفظ…' : editingUserId ? 'تحديث صلاحيات الموظف' : 'حفظ الموظف والصلاحيات'}</button>{editingUserId && <button type="button" className="governance-cancel-edit" onClick={() => { setEditingUserId(null); setSelectedUser(''); setRoleKey('operations_manager'); setDraftPermissions({ ...rolePresets.operations_manager.permissions }); }}>إلغاء التعديل</button>}</div>
       </form>
       <div className="governance-section-head"><div><span className="eyebrow">ACTIVE ADMIN STAFF</span><h2>الفريق والصلاحيات الحالية</h2></div></div>
       <div className="governance-staff-list">{staff.map(s => {
@@ -243,7 +254,7 @@ export default function AdminGovernance({ view, currentUserId }: { view: Mode; c
         return <article className="governance-staff-card" key={s.user_id}>
           <div className="governance-staff-identity"><div className="governance-avatar"><Shield size={20}/></div><div><b>{p?.full_name || 'مستخدم إداري'}</b><small>{p?.phone || s.user_id.slice(0, 8)} · {rolePresets[s.role_key]?.label || 'دور مخصص'}</small></div></div>
           <div className="governance-staff-meta"><span>{activeCount} صلاحية</span><span className={s.is_active ? 'status-active' : 'status-paused'}>{s.is_active ? 'مفعّل' : 'موقوف'}</span></div>
-          <div className="governance-staff-actions"><button type="button" onClick={() => void setStaffActive(s.user_id, !s.is_active)}>{s.is_active ? 'إيقاف الصلاحيات' : 'إعادة التفعيل'}</button><button type="button" className="danger-link" onClick={() => void removeStaff(s.user_id)}>حذف الصلاحيات</button></div>
+          <div className="governance-staff-actions"><button type="button" onClick={() => editStaffMember(s)}>تعديل الصلاحيات</button><button type="button" onClick={() => void setStaffActive(s.user_id, !s.is_active)}>{s.is_active ? 'إيقاف الصلاحيات' : 'إعادة التفعيل'}</button><button type="button" className="danger-link" onClick={() => void removeStaff(s.user_id)}>حذف الصلاحيات</button></div>
         </article>;
       })}{!staff.length && <div className="governance-empty">لا يوجد موظفون إداريون إضافيون. حساب المدير الرئيسي يبقى مستقلاً ولا يظهر ضمن هذه القائمة.</div>}</div>
     </>}
