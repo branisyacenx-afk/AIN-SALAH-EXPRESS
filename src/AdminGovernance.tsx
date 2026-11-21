@@ -106,7 +106,7 @@ export default function AdminGovernance({ view, currentUserId }: { view: Mode; c
           view === 'performance-admin' ? readAll('admin_performance_stores', 'id,name,is_active') : Promise.resolve([]),
           view === 'performance-admin' ? readAll('admin_performance_driver_directory', 'user_id,full_name,vehicle_type,is_approved,is_online,is_suspended,created_at') : Promise.resolve([]),
           Promise.resolve([]),
-          view === 'quality-admin' ? readAll('support_tickets', 'id,status,priority,created_at,updated_at') : Promise.resolve([]),
+          view === 'quality-admin' ? readAll('admin_support_ticket_metrics', 'id,status,priority,created_at,updated_at') : Promise.resolve([]),
           view === 'finance-admin' ? readAll('financial_ledger', 'id,entity_type,entry_type,direction,amount_dzd,status,reference,created_at') : Promise.resolve([]),
           view === 'finance-admin' ? readAll('payments', 'id,order_id,method,status,amount_dzd,provider,created_at') : Promise.resolve([]),
           view === 'finance-admin' ? readAll('settlement_requests', 'id,entity_type,status,amount_dzd,requested_at') : Promise.resolve([])
