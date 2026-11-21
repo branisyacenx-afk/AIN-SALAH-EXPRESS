@@ -281,9 +281,9 @@ export default function AdminGovernance({ view, currentUserId }: { view: Mode; c
         <article><span>تذاكر دعم مفتوحة</span><b>{openTickets.length}</b><small>حسب حالات التذاكر</small></article>
       </div>
       <div className="governance-two-col">
-        <article className="governance-panel"><div className="governance-section-head"><div><span className="eyebrow">CUSTOMER VOICE</span><h2>آخر تقييمات العملاء</h2></div><span className="governance-count"><Star size={14}/>{reviews.length}</span></div>
-          {[...reviews].sort((a,b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()).slice(0,12).map(r => <div className="governance-review" key={r.id}><div><b>{'★'.repeat(Math.max(0, Math.min(5, Number(r.rating))))}{'☆'.repeat(5-Math.max(0, Math.min(5, Number(r.rating))))}</b><small>{formatDate(r.created_at)}</small></div><p>{r.comment || 'بدون تعليق نصي'}</p><span>طلب #{String(r.order_id || '').slice(0, 8)}</span></div>)}
-          {!reviews.length && <div className="governance-empty">لا توجد تقييمات بعد. سيظهر هنا رأي العملاء بعد تسليم الطلبات وتقييمها.</div>}
+        <article className="governance-panel"><div className="governance-section-head"><div><span className="eyebrow">CUSTOMER VOICE</span><h2>آخر تقييمات العملاء</h2></div><span className="governance-count"><Star size={14}/>{periodReviews.length}</span></div>
+          {[...periodReviews].sort((a,b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()).slice(0,12).map(r => <div className="governance-review" key={r.id}><div><b>{'★'.repeat(Math.max(0, Math.min(5, Number(r.rating))))}{'☆'.repeat(5-Math.max(0, Math.min(5, Number(r.rating))))}</b><small>{formatDate(r.created_at)}</small></div><p>{r.comment || 'بدون تعليق نصي'}</p><span>طلب #{String(r.order_id || '').slice(0, 8)}</span></div>)}
+          {!reviews.length && <div className="governance-empty">لا توجد تقييمات خلال هذه الفترة. ستظهر آراء العملاء بعد تسليم الطلبات وتقييمها.</div>}
         </article>
         <article className="governance-panel"><div className="governance-section-head"><div><span className="eyebrow">SERVICE ALERTS</span><h2>مؤشرات تحتاج انتباهاً</h2></div></div>
           <div className="governance-alert-line"><AlertTriangle size={17}/><span>التقييمات المنخفضة (نجمتان أو أقل)</span><b>{lowRatings.length}</b></div>
