@@ -171,14 +171,14 @@ export default function AdminGovernance({ view, currentUserId }: { view: Mode; c
     const done = assigned.filter(o => o.status === 'delivered');
     const ratings = reviews.filter(r => r.driver_id === d.user_id).map(r => Number(r.rating));
     const profile = profiles.find(p => p.id === d.user_id);
-    return { ...d, name: profile?.full_name || 'سائق', phone: profile?.phone || '', assigned: assigned.length, done: done.length, rating: average(ratings), ratingCount: ratings.length, completion: assigned.length ? done.length / assigned.length * 100 : 0 };
+    return { ...d, user_id: String(d.user_id || ''), vehicle_type: String(d.vehicle_type || ''), is_suspended: Boolean(d.is_suspended), is_approved: Boolean(d.is_approved), is_online: Boolean(d.is_online), name: profile?.full_name || 'سائق', phone: profile?.phone || '', assigned: assigned.length, done: done.length, rating: average(ratings), ratingCount: ratings.length, completion: assigned.length ? done.length / assigned.length * 100 : 0 };
   }).sort((a, b) => b.done - a.done), [drivers, orders, reviews, profiles]);
 
   const storePerformance = useMemo(() => stores.map(st => {
     const related = orders.filter(o => o.store_id === st.id);
     const done = related.filter(o => o.status === 'delivered');
     const ratings = reviews.filter(r => r.store_id === st.id).map(r => Number(r.rating));
-    return { ...st, totalOrders: related.length, done: done.length, cancelled: related.filter(o => o.status === 'cancelled').length, sales: done.reduce((sum, o) => sum + Number(o.subtotal_dzd || 0), 0), rating: average(ratings), ratingCount: ratings.length };
+    return { ...st, id: String(st.id || ''), name: String(st.name || 'متجر'), is_active: Boolean(st.is_active), totalOrders: related.length, done: done.length, cancelled: related.filter(o => o.status === 'cancelled').length, sales: done.reduce((sum, o) => sum + Number(o.subtotal_dzd || 0), 0), rating: average(ratings), ratingCount: ratings.length };
   }).sort((a, b) => b.sales - a.sales), [stores, orders, reviews]);
 
   async function addStaff(e: FormEvent) {
