@@ -6,6 +6,7 @@ on:
     branches: [main]
     paths:
       - 'apps/mobile/**'
+      - 'public/brand-mark.svg'
       - '.github/workflows/android-apk.yml'
 
 permissions:
@@ -35,6 +36,17 @@ jobs:
       - name: Install native app dependencies
         run: npm install
 
+      - name: Generate Android launcher and splash logo
+        working-directory: .
+        run: |
+          python -m pip install --user cairosvg
+          mkdir -p apps/mobile/assets
+          python - <<'PY'
+          import cairosvg
+          cairosvg.svg2png(url="public/brand-mark.svg", write_to="apps/mobile/assets/icon.png", output_width=1024, output_height=1024)
+          PY
+          test -s apps/mobile/assets/icon.png
+
       - name: TypeScript check
         run: npm run typecheck
 
@@ -51,8 +63,13 @@ jobs:
           ./gradlew clean assembleRelease
           APK="$(find app/build/outputs/apk/release -maxdepth 1 -type f -name '*.apk' | head -n 1)"
           test -n "$APK"
+          BUILD_TOOLS="$(find "$ANDROID_HOME/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -n 1)"
+          zipalign -f -v 4 "$APK" "$RUNNER_TEMP/ase-aligned.apk"
+          keytool -genkeypair -v -keystore "$RUNNER_TEMP/ase-release.keystore" -storepass changeit -alias ase-release -keypass changeit -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=AIN SALAH EXPRESS, O=AIN SALAH EXPRESS, L=Ain Salah, ST=Tamanrasset, C=DZ"
+          "$BUILD_TOOLS/apksigner" sign --ks "$RUNNER_TEMP/ase-release.keystore" --ks-key-alias ase-release --ks-pass pass:changeit --key-pass pass:changeit --out "$RUNNER_TEMP/ain-salah-express-native.apk" "$RUNNER_TEMP/ase-aligned.apk"
+          "$BUILD_TOOLS/apksigner" verify --verbose "$RUNNER_TEMP/ain-salah-express-native.apk"
           mkdir -p ../../dist
-          cp "$APK" ../../dist/ain-salah-express-native.apk
+          cp "$RUNNER_TEMP/ain-salah-express-native.apk" ../../dist/ain-salah-express-native.apk
 
       - name: Publish native APK
         working-directory: .
@@ -62,4 +79,4 @@ jobs:
           TAG="native-android-v1.0.${{ github.run_number }}"
           gh release create "$TAG" apps/dist/ain-salah-express-native.apk \
             --title "AIN SALAH EXPRESS Native Android ${TAG}" \
-            --notes "Standalone React Native Android release APK with embedded JavaScript bundle. Customer and driver app. Admin and merchant portals remain on the website."
+            --notes "Standalone React Native Android release APK. Signed and signature-verified in CI, with embedded JavaScript and the official AIN SALAH EXPRESS launcher logo."
