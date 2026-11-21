@@ -22,7 +22,6 @@ const permissionLabels: Record<string, string> = {
   'drivers.manage': 'إدارة السائقين وطلبات الانضمام',
   'catalog.manage': 'إدارة المنتجات والتصنيفات',
   'settings.manage': 'إعدادات المنصة والتسعير والمناطق',
-  'contracts.manage': 'العقود والوثائق القانونية',
   'finance.view': 'عرض المدفوعات والسجلات المالية'
 };
 
