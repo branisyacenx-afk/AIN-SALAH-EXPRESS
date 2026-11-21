@@ -70,6 +70,20 @@ function renderLegalMarkdown(markdown:string){
   return <p className="legal-doc-paragraph" key={i}>{line.replace(/\*\*/g,'')}</p>;
  });
 }
+function fillContractTemplate(template:string,c:ContractRow){
+ let value=template.replace('**رقم العقد:** __________','**رقم العقد:** '+c.contract_number).replace('**التاريخ:** ___ / ___ / ______','**التاريخ:** '+new Date(c.created_at).toLocaleDateString('ar-DZ'));
+ const marker=c.contract_type==='driver'?'**الطرف الثاني — مقدم خدمة التوصيل:**':'**الطرف الثاني — المطعم/المتجر الشريك:**';
+ const at=value.indexOf(marker);
+ if(at>=0){
+  const before=value.slice(0,at),after=value.slice(at);
+  if(c.contract_type==='driver'){
+   value=before+after.replace('الاسم الكامل: __________________','الاسم الكامل: '+c.subject_name).replace('رقم الهاتف: __________','رقم الهاتف: '+(c.subject_phone||'يستكمل')).replace('العنوان: __________','العنوان: '+(c.subject_address||'عين صالح، الجزائر'));
+  }else{
+   value=before+after.replace('الاسم التجاري: __________________','الاسم التجاري: '+c.subject_name).replace('الهاتف: __________________','الهاتف: '+(c.subject_phone||'يستكمل')).replace('البريد الإلكتروني: __________________','البريد الإلكتروني: '+(c.subject_email||'يستكمل')).replace('العنوان: __________________','العنوان: '+(c.subject_address||'عين صالح، الجزائر'));
+  }
+ }
+ return value;
+}
 export function AdminContractManager({background=false}:{background?:boolean}={}){
  const [rows,R]=useState<ContractRow[]>([]),[selected,S]=useState<ContractRow|null>(null),[msg,M]=useState(''),[query,Q]=useState(''),[statusFilter,SF]=useState('all'),[typeFilter,TF]=useState('all'),[doc,D]=useState<LegalDocKey|null>(null),[busy,B]=useState(false);
  const syncContracts=useCallback(async()=>{
@@ -121,7 +135,7 @@ export function AdminContractManager({background=false}:{background?:boolean}={}
   const {error}=await supabase.from('work_contracts').update(patch).eq('id',c.id);
   M(error?'تعذر تحديث العقد: '+error.message:'تم تحديث حالة العقد.');S(null);B(false);await load();
  }
- const activeTemplate=selected?(selected.contract_type==='driver'?DRIVER_CONTRACT_TEMPLATE:MERCHANT_CONTRACT_TEMPLATE):'';
+ const activeTemplate=selected?fillContractTemplate(selected.contract_type==='driver'?DRIVER_CONTRACT_TEMPLATE:MERCHANT_CONTRACT_TEMPLATE,selected):'';
  const metadata=selected?Object.entries(selected.terms||{}).filter(([k])=>!['auto_generated','template_key','template_version','application_status'].includes(k)):[];
  return <section className="admin-workspace admin-contract-hub" dir="rtl">
   <div className="admin-welcome"><div><span className="eyebrow">LEGAL GOVERNANCE · PRIVATE ADMINISTRATION</span><h1>مركز العقود والوثائق القانونية</h1><p>قوالب عربية رسمية منفصلة للسائقين والشركاء، بيانات تلقائية، مراجعة قبل الإصدار، سجل موحد، وتتبع حالة كل نسخة.</p></div><span className="admin-count">{rows.length} عقد · {rows.filter(c=>c.status==='signed').length} موقّع · {rows.filter(c=>c.status==='draft').length} مسودة</span></div>
