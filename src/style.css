@@ -413,3 +413,16 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 @media(max-width:900px){.contract-template-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.ops-control .admin-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.legal-auto-fields>div{grid-template-columns:120px 1fr}}
 @media(max-width:620px){.contract-filter-row{grid-template-columns:1fr}.contract-template-grid{grid-template-columns:1fr 1fr}.ase-legal-document{padding:20px 16px}.legal-document-brand img{width:58px;height:58px}.legal-document-brand b{font-size:15px}.legal-auto-fields>div{grid-template-columns:1fr 1fr;gap:7px}.contract-template-grid button{min-height:145px;padding:13px}.ops-control .admin-kpis{grid-template-columns:1fr 1fr}}
 @media print{.ase-legal-document{max-width:none!important;padding:10mm!important;border:0!important;box-shadow:none!important}.legal-document-brand{break-inside:avoid}.legal-auto-fields{break-inside:avoid}.legal-doc-heading{break-after:avoid}.legal-doc-paragraph,.legal-doc-list{orphans:3;widows:3}}
+
+/* Executive admin navigation and analytics */
+.app>header nav{flex:1;min-width:0;overflow-x:auto;overflow-y:hidden;white-space:nowrap;scrollbar-width:thin;justify-content:flex-start}
+.app>header nav button{flex:0 0 auto;white-space:nowrap;padding:10px 12px}
+.admin-reports .report-status-row{display:grid;gap:8px;padding:13px 0;border-bottom:1px solid var(--line)}
+.admin-reports .report-status-row>div:first-child{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:12px}
+.admin-reports .report-status-row>div:first-child span{color:var(--muted);font-size:11px;font-variant-numeric:tabular-nums}
+.admin-reports .report-bar{height:9px;background:#edf1ed;border-radius:20px;overflow:hidden}
+.admin-reports .report-bar i{display:block;height:100%;border-radius:20px;background:linear-gradient(90deg,#f4b27e,#e78343);min-width:2px}
+.admin-reports .report-side-stat{display:flex;justify-content:space-between;align-items:center;padding:13px 0;border-bottom:1px solid var(--line);font-size:12px}
+.admin-reports .report-side-stat b{font-size:17px;font-variant-numeric:tabular-nums;color:#244b38}
+@media(max-width:800px){.app>header nav{order:3;width:100%;max-width:100%;justify-content:flex-start;padding-bottom:4px}.app>header nav button{flex:0 0 auto;padding:9px 12px;font-size:11px}.admin-reports .admin-columns{grid-template-columns:1fr}}
+@media(max-width:480px){.admin-reports .admin-kpis{grid-template-columns:1fr 1fr}.admin-reports .admin-welcome{align-items:flex-start;gap:12px;flex-direction:column}.admin-reports .report-status-row>div:first-child{font-size:11px}}
