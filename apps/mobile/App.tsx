@@ -12,7 +12,7 @@ type Store = { id: string; name: string; category: string; description?: string;
 type Product = { id: number; store_id: string | null; name: string; description?: string; category: string; price_dzd: number; image_url?: string | null; is_available: boolean };
 type Order = { id: string; order_number?: number; customer_phone: string; delivery_address: string; items: any[]; total_amount: number; status: string; driver_id: string | null; created_at: string };
 
-const C = { ink: '#142b27', green: '#087f5b', mint: '#e8f5ef', gold: '#e5a72c', bg: '#f5f7f5', white: '#fff', muted: '#718078', line: '#e5ebe7', red: '#b42318' };
+const C = { ink: '#171717', green: '#f28c45', mint: '#fff1e3', gold: '#ffad62', bg: '#f7f9f6', white: '#ffffff', muted: '#839087', line: '#e5ece6', red: '#b42318', text: '#193128', soft: '#fff7f0' };
 const money = (n: number) => new Intl.NumberFormat('fr-DZ').format(n) + ' دج';
 const statusLabel: Record<string,string> = { pending:'طلب جديد', confirmed:'تم التأكيد', preparing:'قيد التحضير', ready:'جاهز للاستلام', assigned:'تم تعيين سائق', picked_up:'تم الاستلام', on_the_way:'في الطريق إليك', delivered:'تم التسليم', cancelled:'ملغى' };
 
@@ -169,7 +169,7 @@ export default function App() {
   if (!isSupabaseConfigured || !supabase) return <SafeAreaView style={s.page}><View style={s.brand}><Image source={require("./assets/icon.png")} style={{ width: 88, height: 88, borderRadius: 22 }} resizeMode="contain" /><Text style={s.brandTitle}>عين صالح إكسبريس</Text></View><Text style={s.notice}>يلزم ربط التطبيق بإعدادات Supabase نفسها المستخدمة في الموقع.</Text></SafeAreaView>;
 
   if (!session) return <SafeAreaView style={s.page}><StatusBar barStyle="dark-content"/><KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={s.authWrap}>
-    <View style={s.brand}><Text style={s.brandMark}>ASE</Text><Text style={s.brandTitle}>عين صالح إكسبريس</Text><Text style={s.muted}>خدمات مدينتك، أقرب إليك</Text></View>
+    <View style={s.brand}><Image source={require("./assets/icon.png")} style={s.brandLogo} resizeMode="contain"/><Text style={s.brandTitle}>عين صالح إكسبريس</Text><Text style={s.muted}>خدمات مدينتك، أقرب إليك</Text><View style={s.brandAccent}/></View>
     <View style={s.panel}><Text style={s.heading}>{signUp ? 'إنشاء حساب زبون' : 'مرحباً بعودتك'}</Text><Text style={s.muted}>سجل الدخول بنفس حسابك في منصة عين صالح إكسبريس</Text>
       {signUp && <><Field placeholder="الاسم الكامل" value={fullName} onChangeText={setFullName}/><Field placeholder="رقم الهاتف" value={phone} onChangeText={setPhone} keyboardType="phone-pad"/></>}
       <Field placeholder="البريد الإلكتروني" value={email} onChangeText={setEmail} autoCapitalize="none" keyboardType="email-address"/>
@@ -181,7 +181,7 @@ export default function App() {
 
   if (isStaff) return <SafeAreaView style={s.page}><View style={s.brand}><Text style={s.brandTitle}>هذا التطبيق للزبائن والسائقين فقط</Text><Text style={s.muted}>لوحة الإدارة والمتاجر متاحة عبر الموقع على الكمبيوتر والآيباد.</Text><PrimaryButton title="تسجيل الخروج" onPress={() => supabase?.auth.signOut()}/></View></SafeAreaView>;
 
-  if (isDriver) return <SafeAreaView style={s.page}><StatusBar barStyle="dark-content"/><View style={s.header}><View><Text style={s.kicker}>AIN SALAH EXPRESS</Text><Text style={s.heading}>مساحة السائق</Text></View><Pressable onPress={() => supabase?.auth.signOut()}><Text style={s.linkText}>خروج</Text></Pressable></View>
+  if (isDriver) return <SafeAreaView style={s.page}><StatusBar barStyle="dark-content"/><View style={s.header}><View style={s.headerBrand}><Image source={require("./assets/icon.png")} style={s.headerLogo} resizeMode="contain"/><View><Text style={s.kicker}>AIN SALAH EXPRESS</Text><Text style={s.heading}>مساحة السائق</Text></View></View><Pressable onPress={() => supabase?.auth.signOut()}><Text style={s.linkText}>خروج</Text></Pressable></View>
     <View style={s.driverBanner}><Text style={s.driverTitle}>جاهز للتوصيل؟</Text><Text style={s.driverCopy}>فعّل مشاركة الموقع أثناء العمل ليتمكن الزبون من متابعة رحلتك.</Text><PrimaryButton title={tracking ? 'إيقاف مشاركة الموقع' : 'بدء مشاركة الموقع'} onPress={() => setTracking(v => !v)}/></View>
     <Text style={s.sectionTitle}>طلباتي المسندة</Text><FlatList data={orders} keyExtractor={o => o.id} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh}/>} contentContainerStyle={s.list} ListEmptyComponent={<Text style={s.empty}>لا توجد طلبات مسندة إليك حالياً.</Text>} renderItem={({item}) => <View style={s.orderCard}><View style={s.row}><Text style={s.orderNo}>طلب #{item.order_number || item.id.slice(0,8)}</Text><Text style={s.pill}>{statusLabel[item.status] || item.status}</Text></View><Text style={s.body}>{item.delivery_address}</Text><Text style={s.body}>هاتف الزبون: {item.customer_phone}</Text><Text style={s.price}>{money(item.total_amount)}</Text>
       {item.status === 'assigned' && <PrimaryButton title="استلام الطلب" onPress={() => updateOrder(item,'picked_up')} disabled={busy}/>}
@@ -190,12 +190,12 @@ export default function App() {
     </View>}/></SafeAreaView>;
 
   const shownProducts = products.filter(p => !selectedStore || p.store_id === selectedStore);
-  return <SafeAreaView style={s.page}><StatusBar barStyle="dark-content"/><View style={s.header}><View><Text style={s.kicker}>AIN SALAH EXPRESS</Text><Text style={s.heading}>أهلاً بك 👋</Text></View><Pressable onPress={() => supabase?.auth.signOut()}><Text style={s.linkText}>خروج</Text></Pressable></View>
+  return <SafeAreaView style={s.page}><StatusBar barStyle="dark-content"/><View style={s.header}><View style={s.headerBrand}><Image source={require("./assets/icon.png")} style={s.headerLogo} resizeMode="contain"/><View><Text style={s.kicker}>AIN SALAH EXPRESS</Text><Text style={s.heading}>أهلاً بك 👋</Text></View></View><Pressable onPress={() => supabase?.auth.signOut()}><Text style={s.linkText}>خروج</Text></Pressable></View>
     <View style={s.hero}><Text style={s.heroTitle}>وش تحب نوصلك اليوم؟</Text><Text style={s.heroSub}>متاجر وخدمات محلية في عين صالح</Text></View>
     <View style={s.tabs}>{(['browse','cart','orders'] as const).map((v) => <Pressable key={v} onPress={() => setTab(v)} style={[s.tab, tab===v && s.tabActive]}><Text style={[s.tabText,tab===v&&s.tabTextActive]}>{v==='browse'?'اكتشف':v==='cart'?'السلة ('+cartItems.length+')':'طلباتي'}</Text></Pressable>)}</View>
     {tab==='browse' && <ScrollView refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh}/>} contentContainerStyle={s.list}>
       <Text style={s.sectionTitle}>المتاجر</Text><ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.storeRow}><Pressable onPress={() => setSelectedStore(null)} style={[s.storeChip,!selectedStore&&s.storeChipActive]}><Text style={[s.storeChipText,!selectedStore&&s.storeChipTextActive]}>الكل</Text></Pressable>{stores.map(st => <Pressable key={st.id} onPress={() => setSelectedStore(st.id===selectedStore?null:st.id)} style={[s.storeChip,selectedStore===st.id&&s.storeChipActive]}><Text style={[s.storeChipText,selectedStore===st.id&&s.storeChipTextActive]}>{st.name}</Text></Pressable>)}</ScrollView>
-      <Text style={s.sectionTitle}>المنتجات</Text>{shownProducts.map(p => <View key={p.id} style={s.productCard}><View style={s.productInfo}><Text style={s.productName}>{p.name}</Text><Text style={s.muted}>{p.description || p.category}</Text><Text style={s.price}>{money(p.price_dzd)}</Text></View><View style={s.qty}><Pressable onPress={() => setCart(old => ({...old,[p.id]:Math.max(0,(old[p.id]||0)-1)}))}><Text style={s.qtyButton}>−</Text></Pressable><Text style={s.qtyValue}>{cart[p.id]||0}</Text><Pressable onPress={() => setCart(old => ({...old,[p.id]:(old[p.id]||0)+1}))}><Text style={s.qtyButton}>+</Text></Pressable></View></View>)}
+      <Text style={s.sectionTitle}>المنتجات</Text>{shownProducts.map(p => <View key={p.id} style={s.productCard}>{p.image_url ? <Image source={{ uri: p.image_url }} style={s.productImage} resizeMode="cover"/> : <View style={s.productImageFallback}><Text style={s.productImageEmoji}>🛍️</Text></View>}<View style={s.productInfo}><Text style={s.productName}>{p.name}</Text><Text style={s.muted}>{p.description || p.category}</Text><Text style={s.price}>{money(p.price_dzd)}</Text></View><View style={s.qty}><Pressable onPress={() => setCart(old => ({...old,[p.id]:Math.max(0,(old[p.id]||0)-1)}))}><Text style={s.qtyButton}>−</Text></Pressable><Text style={s.qtyValue}>{cart[p.id]||0}</Text><Pressable onPress={() => setCart(old => ({...old,[p.id]:(old[p.id]||0)+1}))}><Text style={s.qtyButton}>+</Text></Pressable></View></View>)}
       {shownProducts.length===0 && <Text style={s.empty}>لا توجد منتجات معروضة حالياً.</Text>}
     </ScrollView>}
     {tab==='cart' && <ScrollView contentContainerStyle={s.list}><Text style={s.sectionTitle}>سلة مشترياتك</Text>{cartItems.map(p=><View key={p.id} style={s.productCard}><View style={s.productInfo}><Text style={s.productName}>{p.name} × {p.quantity}</Text><Text style={s.price}>{money(p.price_dzd*p.quantity)}</Text></View></View>)}<Text style={s.total}>المجموع: {money(subtotal)}</Text><Field placeholder="عنوان التوصيل بالتفصيل" value={address} onChangeText={setAddress}/><Field placeholder="رقم هاتف الاستلام" value={deliveryPhone} onChangeText={setDeliveryPhone} keyboardType="phone-pad"/><Field placeholder="ملاحظات للسائق أو المتجر (اختياري)" value={notes} onChangeText={setNotes}/><Text style={s.muted}>تُحسب رسوم التوصيل وفق إعدادات المنصة عند تأكيد الطلب.</Text><PrimaryButton title={busy?'جارٍ إرسال الطلب...':'تأكيد وإرسال الطلب'} onPress={placeOrder} disabled={busy||cartItems.length===0}/></ScrollView>}
@@ -204,5 +204,59 @@ export default function App() {
 }
 
 const s = StyleSheet.create({
-  page:{flex:1,backgroundColor:C.bg},center:{flex:1,alignItems:'center',justifyContent:'center',gap:12,backgroundColor:C.bg},authWrap:{flex:1,justifyContent:'center',padding:22},brand:{alignItems:'center',marginBottom:26},brandMark:{backgroundColor:C.green,color:C.white,fontSize:22,fontWeight:'900',paddingHorizontal:18,paddingVertical:10,borderRadius:16,overflow:'hidden'},brandTitle:{fontSize:25,fontWeight:'900',color:C.ink,marginTop:12},muted:{fontSize:13,color:C.muted,lineHeight:21},notice:{margin:24,textAlign:'center',color:C.ink},panel:{backgroundColor:C.white,borderRadius:24,padding:20,gap:13,borderWidth:1,borderColor:C.line},heading:{fontSize:23,fontWeight:'900',color:C.ink},field:{backgroundColor:'#f7faf8',borderWidth:1,borderColor:C.line,borderRadius:13,paddingHorizontal:14,paddingVertical:13,fontSize:15,color:C.ink,textAlign:'right'},primary:{backgroundColor:C.green,padding:15,borderRadius:14,alignItems:'center',marginTop:6},primaryText:{color:C.white,fontSize:15,fontWeight:'800'},link:{alignItems:'center',padding:8},linkText:{color:C.green,fontWeight:'800'},header:{paddingHorizontal:18,paddingVertical:14,flexDirection:'row',alignItems:'center',justifyContent:'space-between'},kicker:{fontSize:10,color:C.green,fontWeight:'900',letterSpacing:1},hero:{marginHorizontal:16,backgroundColor:C.ink,borderRadius:22,padding:20,marginBottom:14},heroTitle:{fontSize:22,fontWeight:'900',color:C.white,textAlign:'right'},heroSub:{color:'#d5e6dd',marginTop:7,textAlign:'right'},tabs:{flexDirection:'row',marginHorizontal:14,backgroundColor:'#e9efeb',borderRadius:14,padding:4,marginBottom:8},tab:{flex:1,padding:11,alignItems:'center',borderRadius:11},tabActive:{backgroundColor:C.white},tabText:{color:C.muted,fontWeight:'700'},tabTextActive:{color:C.green},list:{padding:16,paddingBottom:40},sectionTitle:{fontSize:18,fontWeight:'900',color:C.ink,textAlign:'right',marginTop:8,marginBottom:12},storeRow:{gap:8,paddingBottom:12},storeChip:{backgroundColor:C.white,borderWidth:1,borderColor:C.line,paddingHorizontal:15,paddingVertical:11,borderRadius:30},storeChipActive:{backgroundColor:C.green,borderColor:C.green},storeChipText:{color:C.ink,fontWeight:'700'},storeChipTextActive:{color:C.white},productCard:{backgroundColor:C.white,borderWidth:1,borderColor:C.line,borderRadius:17,padding:14,marginBottom:10,flexDirection:'row',alignItems:'center',gap:12},productInfo:{flex:1,alignItems:'flex-end',gap:4},productName:{fontSize:15,fontWeight:'800',color:C.ink},price:{color:C.green,fontSize:15,fontWeight:'900',marginTop:4},qty:{flexDirection:'row',alignItems:'center',gap:12},qtyButton:{fontSize:24,fontWeight:'900',color:C.green},qtyValue:{fontWeight:'800',color:C.ink},total:{fontSize:18,fontWeight:'900',color:C.ink,textAlign:'right',marginVertical:14},empty:{color:C.muted,textAlign:'center',padding:30,lineHeight:24},orderCard:{backgroundColor:C.white,borderRadius:17,borderWidth:1,borderColor:C.line,padding:15,marginBottom:12,gap:8},row:{flexDirection:'row',alignItems:'center',justifyContent:'space-between'},orderNo:{fontWeight:'900',color:C.ink},pill:{backgroundColor:C.mint,color:C.green,paddingHorizontal:10,paddingVertical:6,borderRadius:20,fontSize:11,fontWeight:'800',overflow:'hidden'},body:{color:C.ink,textAlign:'right'},driverBanner:{margin:16,padding:18,borderRadius:20,backgroundColor:C.ink,gap:9},driverTitle:{fontSize:21,fontWeight:'900',color:C.white,textAlign:'right'},driverCopy:{color:'#d5e6dd',textAlign:'right',lineHeight:22}
+  page:{flex:1,backgroundColor:C.bg},
+  center:{flex:1,alignItems:'center',justifyContent:'center',gap:12,backgroundColor:C.bg},
+  authWrap:{flex:1,justifyContent:'center',paddingHorizontal:22,paddingVertical:28},
+  brand:{alignItems:'center',marginBottom:28},
+  brandLogo:{width:104,height:104,borderRadius:28,marginBottom:8},
+  brandAccent:{width:48,height:4,borderRadius:8,backgroundColor:C.green,marginTop:18},
+  brandTitle:{fontSize:25,fontWeight:'900',color:C.ink,marginTop:12,textAlign:'center'},
+  muted:{fontSize:13,color:C.muted,lineHeight:21,textAlign:'right'},
+  notice:{margin:24,textAlign:'center',color:C.text,lineHeight:24},
+  panel:{backgroundColor:C.white,borderRadius:22,padding:20,gap:13,borderWidth:1,borderColor:C.line,shadowColor:'#17231f',shadowOpacity:.07,shadowRadius:18,shadowOffset:{width:0,height:8},elevation:3},
+  heading:{fontSize:23,fontWeight:'900',color:C.ink,textAlign:'right'},
+  field:{backgroundColor:'#ffffff',borderWidth:1,borderColor:C.line,borderRadius:13,paddingHorizontal:14,paddingVertical:14,fontSize:15,color:C.text,textAlign:'right'},
+  primary:{backgroundColor:C.green,padding:15,borderRadius:13,alignItems:'center',marginTop:6,shadowColor:'#e77b36',shadowOpacity:.18,shadowRadius:9,shadowOffset:{width:0,height:4},elevation:2},
+  primaryText:{color:C.ink,fontSize:15,fontWeight:'900'},
+  link:{alignItems:'center',padding:10},
+  linkText:{color:'#d87532',fontWeight:'900'},
+  header:{paddingHorizontal:18,paddingVertical:14,flexDirection:'row',alignItems:'center',justifyContent:'space-between',backgroundColor:C.white,borderBottomWidth:1,borderBottomColor:C.line},
+  headerBrand:{flexDirection:'row',alignItems:'center',gap:11},
+  headerLogo:{width:42,height:42,borderRadius:12},
+  kicker:{fontSize:9,color:'#d87532',fontWeight:'900',letterSpacing:1.2,textAlign:'right'},
+  hero:{marginHorizontal:16,backgroundColor:C.ink,borderRadius:22,padding:22,marginTop:16,marginBottom:14,overflow:'hidden',borderBottomWidth:4,borderBottomColor:C.green},
+  heroTitle:{fontSize:23,fontWeight:'900',color:C.white,textAlign:'right'},
+  heroSub:{color:'#e4e8e4',marginTop:8,textAlign:'right',fontSize:13,lineHeight:21},
+  tabs:{flexDirection:'row',marginHorizontal:14,backgroundColor:'#ecefea',borderRadius:14,padding:4,marginBottom:8},
+  tab:{flex:1,padding:12,alignItems:'center',borderRadius:11},
+  tabActive:{backgroundColor:C.white,borderWidth:1,borderColor:'#f1d4bd',shadowColor:'#171717',shadowOpacity:.05,shadowRadius:5,elevation:1},
+  tabText:{color:C.muted,fontWeight:'700',fontSize:12},
+  tabTextActive:{color:'#bd622b',fontWeight:'900'},
+  list:{padding:16,paddingBottom:40},
+  sectionTitle:{fontSize:18,fontWeight:'900',color:C.ink,textAlign:'right',marginTop:12,marginBottom:13},
+  storeRow:{gap:8,paddingBottom:12},
+  storeChip:{backgroundColor:C.white,borderWidth:1,borderColor:C.line,paddingHorizontal:16,paddingVertical:11,borderRadius:13},
+  storeChipActive:{backgroundColor:C.ink,borderColor:C.ink},
+  storeChipText:{color:C.text,fontWeight:'700',fontSize:12},
+  storeChipTextActive:{color:C.white},
+  productCard:{backgroundColor:C.white,borderWidth:1,borderColor:C.line,borderRadius:17,padding:12,marginBottom:11,flexDirection:'row',alignItems:'center',gap:12,shadowColor:'#193128',shadowOpacity:.035,shadowRadius:9,shadowOffset:{width:0,height:3},elevation:1},
+  productImage:{width:82,height:82,borderRadius:13,backgroundColor:'#f2f2ef'},
+  productImageFallback:{width:82,height:82,borderRadius:13,backgroundColor:C.soft,alignItems:'center',justifyContent:'center'},
+  productImageEmoji:{fontSize:30},
+  productInfo:{flex:1,alignItems:'flex-end',gap:4},
+  productName:{fontSize:14,fontWeight:'900',color:C.text,textAlign:'right'},
+  price:{color:'#d87532',fontSize:15,fontWeight:'900',marginTop:4},
+  qty:{flexDirection:'row',alignItems:'center',gap:10,backgroundColor:'#f7f8f5',borderRadius:12,paddingHorizontal:8,paddingVertical:4},
+  qtyButton:{fontSize:23,fontWeight:'900',color:'#d87532'},
+  qtyValue:{fontWeight:'900',color:C.ink,minWidth:14,textAlign:'center'},
+  total:{fontSize:18,fontWeight:'900',color:C.ink,textAlign:'right',marginVertical:14},
+  empty:{color:C.muted,textAlign:'center',padding:30,lineHeight:24,backgroundColor:C.white,borderWidth:1,borderColor:C.line,borderRadius:16,overflow:'hidden',marginTop:10},
+  orderCard:{backgroundColor:C.white,borderRadius:17,borderWidth:1,borderColor:C.line,padding:16,marginBottom:12,gap:9},
+  row:{flexDirection:'row',alignItems:'center',justifyContent:'space-between'},
+  orderNo:{fontWeight:'900',color:C.ink},
+  pill:{backgroundColor:C.mint,color:'#a95824',paddingHorizontal:10,paddingVertical:6,borderRadius:20,fontSize:11,fontWeight:'900',overflow:'hidden'},
+  body:{color:C.text,textAlign:'right',lineHeight:22},
+  driverBanner:{margin:16,padding:20,borderRadius:20,backgroundColor:C.ink,gap:10,borderBottomWidth:4,borderBottomColor:C.green},
+  driverTitle:{fontSize:22,fontWeight:'900',color:C.white,textAlign:'right'},
+  driverCopy:{color:'#e4e8e4',textAlign:'right',lineHeight:23,fontSize:13}
 });
