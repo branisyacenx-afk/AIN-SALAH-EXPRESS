@@ -654,3 +654,47 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .driver-selected-files>span{display:flex;align-items:center;justify-content:space-between;gap:8px;overflow-wrap:anywhere;font-size:11px;color:#43554a}
 .driver-selected-files button{flex:0 0 auto;border:0;background:#fff0e8;color:#a85428;border-radius:8px;padding:6px 9px;font:inherit}
 @media(max-width:560px){.app>main:has(.local-seo-content){padding-top:8px}.driver-document-picker{padding:12px}.driver-selected-files>span{align-items:flex-start}}
+
+/* Customer dashboard: clear two-row mobile header and uncluttered shop-first home */
+.app>header{display:flex;align-items:center;justify-content:space-between;gap:18px;min-height:76px;height:auto}
+.app>header>.brand{flex:0 0 auto}
+.app>header>nav{flex:1;min-width:0;display:flex;align-items:center;justify-content:center;gap:5px}
+.app>header>.account{flex:0 0 auto}
+.app>main>#products{scroll-margin-top:100px}
+@media(max-width:800px){
+ .app>header{display:grid!important;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"brand account" "nav nav";gap:8px 10px;padding:10px 12px!important;min-height:0;height:auto}
+ .app>header>.brand{grid-area:brand;min-width:0;gap:7px}
+ .app>header>.brand img{width:36px;height:36px;flex:0 0 36px}
+ .app>header>.brand b{font-size:12px;white-space:nowrap}
+ .app>header>.brand b small{font-size:7px}
+ .app>header>.account{grid-area:account;justify-self:end;gap:5px;font-size:10px;white-space:nowrap}
+ .app>header>.account button{padding:6px}
+ .app>header>nav{grid-area:nav;order:initial!important;width:100%;min-width:0;display:flex;justify-content:flex-start;gap:6px;overflow-x:auto;overflow-y:hidden;padding:3px 0 6px;scrollbar-width:thin;-webkit-overflow-scrolling:touch}
+ .app>header>nav button{flex:0 0 auto!important;min-width:max-content;min-height:38px;padding:9px 13px!important;font-size:11px!important;white-space:nowrap}
+ .app>header>nav button.active{background:#214d39;color:#fff}
+ .app>main{padding:0 12px 32px}
+ .app>main>.hero{margin:12px 0 18px;padding:24px 17px 14px;min-height:0;grid-template-columns:minmax(0,1fr) minmax(95px,.55fr);gap:8px;border-radius:18px}
+ .app>main>.hero h1{font-size:clamp(23px,6vw,34px);line-height:1.4;overflow-wrap:anywhere}
+ .app>main>.hero p{font-size:11px;line-height:1.8}
+ .app>main>.hero-art{height:120px;font-size:68px}
+ .app>main>#products{margin-top:14px}
+ .app>main>#products .section-head{align-items:flex-start;gap:10px;flex-wrap:wrap;margin:16px 0}
+ .app>main>#products .section-head h2{font-size:22px;line-height:1.4}
+ .app>main>#products .catalog-head-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+ .app>main>#products .catalog-tools{gap:9px;margin:12px 0 16px}
+ .app>main>#products .catalog-tools>input{min-height:48px;font-size:13px}
+ .app>main>#products .category-chips{gap:7px;padding:3px 0 9px}
+ .app>main>#products .category-chips button{min-height:38px;padding:8px 13px;font-size:11px}
+ .app>main>#products .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+ .app>main>#products .product{min-width:0;padding:10px}
+ .app>main>#products .product h3,.app>main>#products .product p{overflow-wrap:anywhere}
+}
+@media(max-width:390px){
+ .app>header>.brand img{width:32px;height:32px;flex-basis:32px}
+ .app>header>.brand b{font-size:11px}
+ .app>header>.account{gap:2px}
+ .app>header>.account span{font-size:9px}
+ .app>main>.hero{grid-template-columns:1fr}
+ .app>main>.hero-art{height:100px;font-size:60px}
+ .app>main>#products .section-head h2{font-size:20px}
+}
