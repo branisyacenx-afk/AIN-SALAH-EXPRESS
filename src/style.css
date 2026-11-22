@@ -698,3 +698,48 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
  .app>main>.hero-art{height:100px;font-size:60px}
  .app>main>#products .section-head h2{font-size:20px}
 }
+
+/* Actual header selectors: customer workspace and public site mobile layout */
+.app>header{display:grid!important;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"brand account" "nav nav";align-items:center;gap:9px 12px;height:auto!important;min-height:0!important;padding:12px 18px!important}
+.app>header>.brand{grid-area:brand;justify-self:start;min-width:0}
+.app>header>.account{grid-area:account;justify-self:end;display:flex;align-items:center;gap:10px;white-space:nowrap}
+.app>header>nav{grid-area:nav;display:flex!important;flex-wrap:nowrap;justify-content:flex-start!important;align-items:center;gap:7px;width:100%;min-width:0;overflow-x:auto;overflow-y:hidden;padding:3px 0 6px;scrollbar-width:thin;-webkit-overflow-scrolling:touch}
+.app>header>nav>button{flex:0 0 auto;min-width:max-content;white-space:nowrap;min-height:40px;padding:9px 14px}
+.app>main{min-width:0}
+.app>main>#products{scroll-margin-top:125px}
+@media(max-width:760px){
+ .public-header{display:grid!important;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"brand actions" "nav nav";height:auto!important;min-height:0;padding:12px 14px!important;gap:10px}
+ .public-header>.brand{grid-area:brand;min-width:0}
+ .public-header>.public-actions{grid-area:actions;justify-self:end;display:flex;align-items:center;gap:6px;flex-wrap:nowrap}
+ .public-header>.public-main-nav{grid-area:nav;display:flex!important;width:100%;justify-content:flex-start!important;align-items:center;padding:8px 0 2px;border-top:1px solid #edf1ed;overflow:visible}
+ .public-main-nav .public-more-menu>summary{width:40px;height:38px}
+ .public-header .public-actions .primary,.public-header .public-actions .public-login,.public-header .public-actions .install-app-button{padding:9px 10px;font-size:11px;white-space:nowrap}
+}
+@media(max-width:760px){
+ .app>header{padding:10px 12px!important}
+ .app>header>.brand img{width:38px;height:38px;flex:0 0 38px}
+ .app>header>.brand b{font-size:13px}
+ .app>header>.account{gap:7px;font-size:11px}
+ .app>header>nav{justify-content:flex-start!important}
+ .app>header>nav>button{font-size:12px;min-height:42px;padding:10px 14px}
+ .app>main{padding-inline:12px!important}
+ .app>main>.hero{margin:12px 0 18px;padding:22px 16px;min-height:0;grid-template-columns:minmax(0,1fr) minmax(90px,.6fr);gap:10px;border-radius:19px}
+ .app>main>.hero h1{font-size:clamp(23px,6vw,35px);line-height:1.45;overflow-wrap:anywhere}
+ .app>main>.hero p{font-size:12px;line-height:1.9}
+ .app>main>#products{margin-top:16px}
+ .app>main>#products .section-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap}
+ .app>main>#products .section-head h2{font-size:clamp(21px,5.5vw,27px);line-height:1.45}
+ .app>main>#products .catalog-head-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+ .app>main>#products .catalog-tools>input{width:100%;min-height:50px;font-size:14px}
+ .app>main>#products .category-chips{display:flex;gap:7px;overflow-x:auto;white-space:nowrap;padding:4px 0 10px}
+ .app>main>#products .category-chips button{flex:0 0 auto;min-height:40px;padding:9px 14px;font-size:12px}
+}
+@media(max-width:390px){
+ .app>header>.brand img{width:34px;height:34px;flex-basis:34px}
+ .app>header>.brand b{font-size:11px}
+ .app>header>.account{gap:4px}
+ .app>header>.account span{font-size:10px}
+ .app>main>.hero{grid-template-columns:1fr}
+ .app>main>.hero-art{height:105px;font-size:62px}
+ .app>main>#products .section-head h2{font-size:21px}
+}
